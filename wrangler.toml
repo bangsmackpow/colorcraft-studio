@@ -1,0 +1,27 @@
+name = "colorcraft-studio"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "public"
+
+# ─── R2 Bucket binding ───────────────────────────────────────────────────────
+# Create your bucket first:
+#   npx wrangler r2 bucket create colorcraft-outputs
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "colorcraft-outputs"
+
+# ─── Environment Variables ───────────────────────────────────────────────────
+# Set secrets via CLI (never commit API keys to git!):
+#   npx wrangler pages secret put REPLICATE_API_TOKEN
+#   npx wrangler pages secret put PUBLIC_R2_URL
+#
+# PUBLIC_R2_URL = the public URL of your R2 bucket, e.g.:
+#   https://pub-xxxxxxxxxxxxxxxx.r2.dev
+#   or your custom domain if configured
+#
+# To enable public access on your R2 bucket:
+#   Cloudflare Dashboard → R2 → colorcraft-outputs → Settings → Public Access → Enable
+
+[vars]
+# These are non-secret defaults (override with secrets for production)
+MAX_FILE_SIZE_MB = "10"
+DEFAULT_STYLE = "clean"

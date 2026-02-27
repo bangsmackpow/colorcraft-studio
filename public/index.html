@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ColorCraft Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1a1008;
+      --paper: #f5f0e8;
+      --cream: #ede7d6;
+      --sepia: #8b6f47;
+      --rust: #c4522a;
+      --sage: #6b8f71;
+      --gold: #d4a843;
+      --shadow: rgba(26,16,8,0.12);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Crimson Pro', Georgia, serif;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(212,168,67,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(196,82,42,0.06) 0%, transparent 50%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    }
+
+    header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 2.5rem 4rem 1.5rem;
+      border-bottom: 1px solid rgba(139,111,71,0.25);
+    }
+    .wordmark { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; letter-spacing: -0.02em; }
+    .wordmark span { color: var(--rust); }
+    .tagline { font-family: 'DM Mono', monospace; font-size: 0.7rem; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sepia); }
+
+    .mode-bar { display: flex; padding: 2rem 4rem 0; }
+    .mode-btn { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.7rem 2rem; border: 1px solid rgba(139,111,71,0.3); background: transparent; color: var(--sepia); cursor: pointer; transition: all 0.2s; }
+    .mode-btn:first-child { border-radius: 3px 0 0 3px; }
+    .mode-btn:last-child { border-radius: 0 3px 3px 0; border-left: none; }
+    .mode-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+    main { padding: 2.5rem 4rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; max-width: 1400px; }
+    @media (max-width: 900px) {
+      header, .mode-bar, main { padding-left: 1.5rem; padding-right: 1.5rem; }
+      main { grid-template-columns: 1fr; }
+    }
+
+    .panel { background: white; border: 1px solid rgba(139,111,71,0.2); border-radius: 6px; padding: 2rem; box-shadow: 0 2px 20px var(--shadow); }
+    .panel + .panel { margin-top: 1.5rem; }
+    .panel-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--cream); display: flex; align-items: center; gap: 0.5rem; }
+    .panel-title .num { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--rust); background: rgba(196,82,42,0.08); padding: 0.2rem 0.5rem; border-radius: 2px; }
+
+    /* Drop zone */
+    .drop-zone { border: 2px dashed rgba(139,111,71,0.35); border-radius: 4px; padding: 3rem 2rem; text-align: center; cursor: pointer; transition: all 0.25s; position: relative; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--rust); background: rgba(196,82,42,0.03); }
+    .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .drop-icon { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; opacity: 0.4; }
+    .drop-text { font-size: 1rem; color: var(--sepia); }
+    .drop-sub { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: rgba(139,111,71,0.6); margin-top: 0.4rem; }
+
+    /* Style cards */
+    .style-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1.4rem; }
+    .style-card { border: 1.5px solid rgba(139,111,71,0.25); border-radius: 4px; padding: 0.85rem 0.9rem; cursor: pointer; transition: all 0.18s; position: relative; }
+    .style-card:hover { border-color: var(--sepia); background: rgba(139,111,71,0.03); }
+    .style-card.selected { border-color: var(--rust); background: rgba(196,82,42,0.05); }
+    .style-card.selected::after { content: '✓'; position: absolute; top: 0.5rem; right: 0.6rem; color: var(--rust); font-size: 0.8rem; font-family: 'DM Mono', monospace; }
+    .style-card-name { font-family: 'Playfair Display', serif; font-size: 0.88rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .style-card-desc { font-size: 0.78rem; color: var(--sepia); font-style: italic; line-height: 1.4; }
+
+    /* Settings */
+    .settings-grid { display: grid; gap: 1.2rem; }
+    .setting-row { display: flex; flex-direction: column; gap: 0.4rem; }
+    .setting-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sepia); }
+    .slider-row { display: flex; align-items: center; gap: 0.8rem; }
+    input[type="range"] { flex: 1; accent-color: var(--rust); height: 3px; }
+    .slider-val { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--sepia); width: 2.5rem; text-align: right; }
+
+    /* Output badges */
+    .output-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .output-badge { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.75rem; border-radius: 2px; background: rgba(107,143,113,0.12); color: #3d6b42; border: 1px solid rgba(107,143,113,0.3); }
+
+    .check-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.92rem; cursor: pointer; }
+    .check-item input[type="checkbox"] { accent-color: var(--rust); width: 14px; height: 14px; }
+
+    /* Queue */
+    .queue-list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 280px; overflow-y: auto; margin-bottom: 1rem; }
+    .queue-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.8rem; background: var(--paper); border: 1px solid rgba(139,111,71,0.15); border-radius: 3px; }
+    .queue-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 2px; border: 1px solid rgba(139,111,71,0.2); flex-shrink: 0; background: var(--cream); }
+    .queue-info { flex: 1; min-width: 0; }
+    .queue-name { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--sepia); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .queue-style-select { font-family: 'DM Mono', monospace; font-size: 0.65rem; padding: 0.2rem 0.4rem; border: 1px solid rgba(139,111,71,0.25); border-radius: 2px; background: white; color: var(--ink); margin-top: 0.3rem; width: 100%; cursor: pointer; }
+    .queue-status { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em; padding: 0.2rem 0.5rem; border-radius: 2px; flex-shrink: 0; }
+    .status-pending { background: rgba(139,111,71,0.1); color: var(--sepia); }
+    .status-processing { background: rgba(212,168,67,0.15); color: #8a6b00; }
+    .status-done { background: rgba(107,143,113,0.15); color: #3d6b42; }
+    .status-error { background: rgba(196,82,42,0.12); color: var(--rust); }
+    .queue-remove { background: none; border: none; cursor: pointer; color: rgba(139,111,71,0.4); font-size: 1rem; line-height: 1; padding: 0 0.2rem; transition: color 0.15s; flex-shrink: 0; }
+    .queue-remove:hover { color: var(--rust); }
+
+    /* Buttons */
+    .btn { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.8rem 1.8rem; border: none; border-radius: 3px; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: var(--ink); color: var(--paper); }
+    .btn-primary:hover { background: #2d1f0f; }
+    .btn-primary:disabled { background: rgba(26,16,8,0.25); cursor: not-allowed; }
+    .btn-secondary { background: transparent; color: var(--sepia); border: 1px solid rgba(139,111,71,0.35); }
+    .btn-secondary:hover { border-color: var(--sepia); }
+    .btn-danger { background: transparent; color: var(--rust); border: 1px solid rgba(196,82,42,0.3); }
+    .btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }
+
+    /* Preview */
+    .preview-area { min-height: 280px; background: var(--cream); border-radius: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(139,111,71,0.15); }
+    .preview-area img { max-width: 100%; max-height: 380px; object-fit: contain; }
+    .preview-empty { text-align: center; color: rgba(139,111,71,0.45); }
+    .preview-empty .big { font-size: 3rem; display: block; margin-bottom: 0.5rem; }
+    .preview-empty p { font-size: 0.9rem; font-style: italic; }
+
+    /* Compare */
+    .compare-wrap { position: relative; width: 100%; cursor: ew-resize; user-select: none; }
+    .compare-wrap img { display: block; width: 100%; }
+    .compare-overlay { position: absolute; top: 0; left: 0; height: 100%; overflow: hidden; border-right: 2px solid var(--rust); }
+    .compare-overlay img { position: absolute; top: 0; left: 0; width: 100%; display: block; }
+    .compare-handle { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 32px; height: 32px; background: var(--rust); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+    /* Downloads */
+    .download-shelf { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; }
+    .download-card { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; border: 1px solid rgba(107,143,113,0.4); border-radius: 3px; background: rgba(107,143,113,0.06); text-decoration: none; color: #3d6b42; font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; transition: all 0.2s; }
+    .download-card:hover { background: rgba(107,143,113,0.14); }
+
+    /* Progress */
+    .progress-bar-wrap { margin-top: 1rem; background: var(--cream); border-radius: 2px; height: 4px; overflow: hidden; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, var(--rust), var(--gold)); width: 0%; transition: width 0.3s ease; border-radius: 2px; }
+    .progress-text { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--sepia); margin-top: 0.4rem; }
+
+    /* API Banner */
+    .api-banner { background: rgba(212,168,67,0.1); border: 1px solid rgba(212,168,67,0.4); border-radius: 4px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 0.75rem; }
+    .api-banner p { font-size: 0.88rem; color: #6b5000; line-height: 1.5; }
+    .api-banner code { font-family: 'DM Mono', monospace; font-size: 0.78rem; background: rgba(212,168,67,0.15); padding: 0.1rem 0.3rem; border-radius: 2px; }
+
+    /* Toast */
+    #toast { position: fixed; bottom: 2rem; right: 2rem; padding: 0.85rem 1.5rem; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; opacity: 0; transform: translateY(10px); transition: all 0.25s; pointer-events: none; z-index: 1000; }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.success { background: #3d6b42; color: white; }
+    #toast.error { background: var(--rust); color: white; }
+
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 0.4rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+
+    /* Modal */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(26,16,8,0.5); z-index: 200; display: flex; align-items: center; justify-content: center; }
+    .modal-box { background: white; border-radius: 6px; padding: 2rem; width: 320px; box-shadow: 0 8px 40px rgba(0,0,0,0.2); }
+    .modal-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; }
+    .modal-select { width: 100%; font-family: 'Crimson Pro', serif; font-size: 0.95rem; padding: 0.55rem 0.8rem; border: 1px solid rgba(139,111,71,0.3); border-radius: 3px; margin-bottom: 1rem; background: var(--paper); color: var(--ink); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">Color<span>Craft</span> Studio</div>
+  <div class="tagline">Photo → Coloring Page · PNG &amp; PDF Output</div>
+</header>
+
+<div class="mode-bar">
+  <button class="mode-btn active" onclick="setMode('single')" id="btn-single">Single Image</button>
+  <button class="mode-btn" onclick="setMode('batch')" id="btn-batch">Batch Mode</button>
+</div>
+
+<main>
+
+  <!-- LEFT COLUMN -->
+  <div>
+    <!-- ── SINGLE MODE ── -->
+    <div id="single-mode">
+      <div class="panel">
+        <div class="panel-title"><span class="num">01</span> Upload Your Photo</div>
+        <div class="drop-zone" id="drop-zone"
+          ondragover="onDrag(event,true,'drop-zone')"
+          ondragleave="onDrag(event,false,'drop-zone')"
+          ondrop="onDrop(event)">
+          <input type="file" id="file-input" accept="image/*" onchange="onFileSelect(event)" />
+          <span class="drop-icon">🖼️</span>
+          <div class="drop-text">Drop your photo here, or click to browse</div>
+          <div class="drop-sub">JPG · PNG · WEBP · up to 10 MB</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title"><span class="num">02</span> Choose Your Style</div>
+
+        <div class="style-cards" id="style-cards">
+          <div class="style-card selected" data-style="clean" onclick="selectStyle(this)">
+            <div class="style-card-name">Clean Outlines</div>
+            <div class="style-card-desc">Simple bold lines — classic coloring book feel</div>
+          </div>
+          <div class="style-card" data-style="detailed" onclick="selectStyle(this)">
+            <div class="style-card-name">Detailed Line Art</div>
+            <div class="style-card-desc">Outlines + internal lines to guide shading</div>
+          </div>
+          <div class="style-card" data-style="bold" onclick="selectStyle(this)">
+            <div class="style-card-name">Bold &amp; Simple</div>
+            <div class="style-card-desc">Thick lines, large shapes — approachable for all</div>
+          </div>
+          <div class="style-card" data-style="intricate" onclick="selectStyle(this)">
+            <div class="style-card-name">Intricate Detail</div>
+            <div class="style-card-desc">Fine patterns &amp; zentangle elements for advanced colorists</div>
+          </div>
+        </div>
+
+        <div class="settings-grid">
+          <div class="setting-row">
+            <label class="setting-label">Line Weight</label>
+            <div class="slider-row">
+              <input type="range" id="line-weight" min="1" max="5" value="2" step="0.5"
+                oninput="document.getElementById('lw-val').textContent=this.value" />
+              <span class="slider-val" id="lw-val">2</span>
+            </div>
+          </div>
+          <div class="setting-row">
+            <label class="setting-label">Detail Level</label>
+            <div class="slider-row">
+              <input type="range" id="detail" min="1" max="10" value="6"
+                oninput="document.getElementById('dl-val').textContent=this.value" />
+              <span class="slider-val" id="dl-val">6</span>
+            </div>
+          </div>
+          <div class="setting-row">
+            <label class="setting-label">Output</label>
+            <div class="output-badges">
+              <span class="output-badge">✓ PNG image</span>
+              <span class="output-badge">✓ PDF 8.5 × 11"</span>
+            </div>
+          </div>
+          <div class="setting-row">
+            <label class="check-item">
+              <input type="checkbox" id="border" checked />
+              Add decorative border &amp; title area
+            </label>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" id="convert-btn" onclick="convertSingle()">Convert to Coloring Page</button>
+          <button class="btn btn-secondary" onclick="resetSingle()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BATCH MODE ── -->
+    <div id="batch-mode" class="hidden">
+      <div class="panel">
+        <div class="panel-title"><span class="num">01</span> Build Your Queue</div>
+        <div class="drop-zone" id="batch-drop"
+          ondragover="onDrag(event,true,'batch-drop')"
+          ondragleave="onDrag(event,false,'batch-drop')"
+          ondrop="onBatchDrop(event)">
+          <input type="file" id="batch-file-input" accept="image/*" multiple onchange="onBatchFileSelect(event)" />
+          <span class="drop-icon">📂</span>
+          <div class="drop-text">Drop multiple photos, or click to select</div>
+          <div class="drop-sub">Select many at once · JPG · PNG · WEBP</div>
+        </div>
+
+        <div style="margin-top:1.5rem">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:0.75rem">
+            <div class="setting-label">Queue — <span id="queue-count">0 images</span></div>
+            <div class="setting-label" style="color:rgba(139,111,71,0.5)">Style per image ↓</div>
+          </div>
+          <div class="queue-list" id="queue-list">
+            <div style="text-align:center;padding:2rem;color:rgba(139,111,71,0.4);font-style:italic;font-size:0.9rem">Queue is empty — add images above</div>
+          </div>
+          <div class="btn-row" style="margin-top:0.75rem">
+            <button class="btn btn-danger" onclick="clearQueue()">Clear All</button>
+            <button class="btn btn-secondary" onclick="openSetAllModal()">Set All Styles…</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title"><span class="num">02</span> Batch Settings</div>
+        <div class="settings-grid">
+          <div class="setting-row">
+            <label class="setting-label">Output for every image</label>
+            <div class="output-badges">
+              <span class="output-badge">✓ PNG image</span>
+              <span class="output-badge">✓ PDF 8.5 × 11"</span>
+              <span class="output-badge">✓ Combined PDF</span>
+            </div>
+          </div>
+          <div class="setting-row">
+            <label class="check-item">
+              <input type="checkbox" id="batch-border" checked />
+              Add decorative border &amp; title area to all pages
+            </label>
+          </div>
+          <div class="setting-row">
+            <label class="setting-label">Concurrency</label>
+            <div class="slider-row">
+              <input type="range" id="concurrency" min="1" max="5" value="2"
+                oninput="document.getElementById('cc-val').textContent=this.value" />
+              <span class="slider-val" id="cc-val">2</span>
+            </div>
+            <span style="font-size:0.8rem;color:var(--sepia);font-style:italic">images processed simultaneously</span>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="batch-btn" onclick="runBatch()">Process All Images</button>
+        </div>
+        <div class="progress-bar-wrap hidden" id="batch-progress-wrap">
+          <div class="progress-bar" id="batch-progress-bar"></div>
+        </div>
+        <div class="progress-text hidden" id="batch-progress-text"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN: Preview -->
+  <div>
+    <div class="panel" style="min-height:500px">
+      <div class="panel-title"><span class="num">03</span> Preview &amp; Download</div>
+
+      <div id="single-preview">
+        <div class="preview-area" id="preview-area">
+          <div class="preview-empty">
+            <span class="big">✏️</span>
+            <p>Your coloring page will appear here</p>
+          </div>
+        </div>
+
+        <div class="hidden" id="compare-section" style="margin-top:1rem">
+          <div class="setting-label" style="margin-bottom:0.5rem">BEFORE / AFTER — drag to compare</div>
+          <div class="compare-wrap" id="compare-wrap"
+            onmousedown="startCompare(event)"
+            ontouchstart="startCompare(event)">
+            <img id="compare-after" src="" alt="coloring page" />
+            <div class="compare-overlay" id="compare-overlay" style="width:50%">
+              <img id="compare-before" src="" alt="original" />
+            </div>
+            <div class="compare-handle" id="compare-handle" style="left:50%">⇔</div>
+          </div>
+        </div>
+
+        <div class="download-shelf hidden" id="download-shelf"></div>
+      </div>
+
+      <div id="batch-preview" class="hidden">
+        <div id="batch-results" style="display:flex;flex-direction:column;gap:0.75rem;"></div>
+        <div class="btn-row hidden" id="batch-download-row">
+          <a class="btn btn-primary" id="batch-zip-link" href="#" download>⬇ Download All as ZIP</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Set-all-styles modal -->
+<div id="style-modal" class="modal-backdrop hidden">
+  <div class="modal-box">
+    <div class="modal-title">Set Style for All Images</div>
+    <select id="modal-style" class="modal-select">
+      <option value="clean">Clean Outlines</option>
+      <option value="detailed">Detailed Line Art</option>
+      <option value="bold">Bold &amp; Simple</option>
+      <option value="intricate">Intricate Detail</option>
+    </select>
+    <div style="display:flex;gap:0.75rem">
+      <button class="btn btn-primary" style="flex:1" onclick="applyAllStyles()">Apply to All</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const STYLES = [
+  { value: 'clean',     label: 'Clean Outlines' },
+  { value: 'detailed',  label: 'Detailed Line Art' },
+  { value: 'bold',      label: 'Bold & Simple' },
+  { value: 'intricate', label: 'Intricate Detail' },
+];
+
+let currentMode = 'single';
+let selectedFile = null;
+let selectedStyle = 'clean';
+let batchQueue = [];
+let batchIdCounter = 0;
+let isComparing = false;
+
+// ── Mode ──────────────────────────────────────────
+function setMode(mode) {
+  currentMode = mode;
+  ['single','batch'].forEach(m => {
+    document.getElementById(`btn-${m}`).classList.toggle('active', m === mode);
+    document.getElementById(`${m}-mode`).classList.toggle('hidden', m !== mode);
+    document.getElementById(`${m}-preview`).classList.toggle('hidden', m !== mode);
+  });
+}
+
+// ── Style selector (single) ───────────────────────
+function selectStyle(card) {
+  document.querySelectorAll('#style-cards .style-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedStyle = card.dataset.style;
+}
+
+// ── Drag & drop ───────────────────────────────────
+function onDrag(e, entering, id) {
+  e.preventDefault();
+  document.getElementById(id).classList.toggle('dragover', entering);
+}
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file?.type.startsWith('image/')) setFile(file);
+  else toast('Please drop an image file', 'error');
+}
+function onBatchDrop(e) {
+  e.preventDefault();
+  document.getElementById('batch-drop').classList.remove('dragover');
+  [...e.dataTransfer.files].filter(f => f.type.startsWith('image/')).forEach(addToQueue);
+}
+function onFileSelect(e) { if (e.target.files[0]) setFile(e.target.files[0]); }
+function onBatchFileSelect(e) {
+  [...e.target.files].forEach(addToQueue);
+  e.target.value = '';
+}
+function setFile(file) {
+  selectedFile = file;
+  const url = URL.createObjectURL(file);
+  document.getElementById('preview-area').innerHTML =
+    `<img src="${url}" alt="preview" style="max-height:340px;object-fit:contain;" />`;
+  document.getElementById('compare-section').classList.add('hidden');
+  document.getElementById('download-shelf').classList.add('hidden');
+  toast(`Loaded: ${file.name}`, 'success');
+}
+
+// ── Single convert ────────────────────────────────
+async function convertSingle() {
+  if (!selectedFile) return toast('Please select an image first', 'error');
+  const btn = document.getElementById('convert-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Rendering…';
+
+  try {
+    const lineWeight = parseFloat(document.getElementById('line-weight').value);
+    const detail     = parseInt(document.getElementById('detail').value);
+    const addBorder  = document.getElementById('border').checked;
+
+    // ── Phase 1: Render coloring page immediately from local file ──
+    // No network call needed — canvas processes the image right in the browser.
+    const localDataUrl = URL.createObjectURL(selectedFile);
+    const coloringPageDataUrl = await renderColoringPage(
+      localDataUrl, selectedStyle, lineWeight, detail, addBorder
+    );
+    URL.revokeObjectURL(localDataUrl);
+
+    // Show result right away — user can already download at this point
+    const previewUrl = URL.createObjectURL(selectedFile);
+    showSingleResult(previewUrl, coloringPageDataUrl, null, selectedFile.name);
+    toast('Coloring page ready!', 'success');
+    btn.disabled = false;
+    btn.textContent = 'Convert to Coloring Page';
+
+    // ── Phase 2: Fetch Gemini tips in background (optional bonus) ──
+    showTipsLoading();
+    try {
+      const fd = new FormData();
+      fd.append('image', selectedFile);
+      fd.append('style', selectedStyle);
+      const res = await fetch('/api/convert', { method: 'POST', body: fd });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.coloringTips) showTips(data.coloringTips);
+        else hideTips();
+      } else { hideTips(); }
+    } catch { hideTips(); }
+
+  } catch (err) {
+    toast(err.message, 'error');
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = 'Convert to Coloring Page';
+    hideTips();
+  }
+}
+
+// ── Canvas-based coloring page renderer ──────────────────────────────────────
+async function renderColoringPage(imageDataUrl, style, lineWeight, detail, addBorder) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        // Work at high resolution for print quality
+        const scale = Math.min(3, 2400 / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+
+        // ── Step 1: Draw image to canvas ──
+        const srcCanvas = document.createElement('canvas');
+        srcCanvas.width = w; srcCanvas.height = h;
+        const srcCtx = srcCanvas.getContext('2d');
+        srcCtx.drawImage(img, 0, 0, w, h);
+        const srcData = srcCtx.getImageData(0, 0, w, h);
+
+        // ── Step 2: Convert to grayscale ──
+        const grayData = toGrayscale(srcData);
+
+        // ── Step 3: Apply Gaussian blur to reduce noise ──
+        const blurRadius = style === 'intricate' ? 1 : style === 'bold' ? 3 : 2;
+        const blurred = gaussianBlur(grayData, w, h, blurRadius);
+
+        // ── Step 4: Sobel edge detection ──
+        const edgeThreshold = getEdgeThreshold(style, detail);
+        const edges = sobelEdges(blurred, w, h, edgeThreshold);
+
+        // ── Step 5: Render as black lines on white ──
+        const outCanvas = document.createElement('canvas');
+        const margin = addBorder ? 80 : 0;
+        outCanvas.width  = w + margin * 2;
+        outCanvas.height = h + margin * 2 + (addBorder ? 60 : 0);
+        const outCtx = outCanvas.getContext('2d');
+
+        // White background
+        outCtx.fillStyle = 'white';
+        outCtx.fillRect(0, 0, outCanvas.width, outCanvas.height);
+
+        // Draw border & title area if requested
+        if (addBorder) {
+          drawPageBorder(outCtx, outCanvas.width, outCanvas.height, margin);
+        }
+
+        // Draw edge pixels as black lines
+        const lw = getLineWidth(style, lineWeight);
+        drawEdges(outCtx, edges, w, h, margin, addBorder ? 60 : 0, lw);
+
+        resolve(outCanvas.toDataURL('image/png'));
+      } catch (e) { reject(e); }
+    };
+    img.onerror = () => reject(new Error('Could not load image for processing'));
+    img.src = imageDataUrl;
+  });
+}
+
+function toGrayscale(imageData) {
+  const data = new Uint8Array(imageData.data.length / 4);
+  for (let i = 0; i < data.length; i++) {
+    const r = imageData.data[i*4];
+    const g = imageData.data[i*4+1];
+    const b = imageData.data[i*4+2];
+    data[i] = Math.round(0.299*r + 0.587*g + 0.114*b);
+  }
+  return data;
+}
+
+function gaussianBlur(data, w, h, radius) {
+  // Simple box blur approximation (fast)
+  const out = new Uint8Array(data.length);
+  const r = Math.max(1, radius);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let sum = 0, count = 0;
+      for (let dy = -r; dy <= r; dy++) {
+        for (let dx = -r; dx <= r; dx++) {
+          const nx = x+dx, ny = y+dy;
+          if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+            sum += data[ny*w+nx];
+            count++;
+          }
+        }
+      }
+      out[y*w+x] = Math.round(sum/count);
+    }
+  }
+  return out;
+}
+
+function sobelEdges(gray, w, h, threshold) {
+  const edges = new Uint8Array(w * h);
+  for (let y = 1; y < h-1; y++) {
+    for (let x = 1; x < w-1; x++) {
+      const tl = gray[(y-1)*w+(x-1)], tm = gray[(y-1)*w+x], tr = gray[(y-1)*w+(x+1)];
+      const ml = gray[y*w+(x-1)],                             mr = gray[y*w+(x+1)];
+      const bl = gray[(y+1)*w+(x-1)], bm = gray[(y+1)*w+x], br = gray[(y+1)*w+(x+1)];
+      const gx = -tl - 2*ml - bl + tr + 2*mr + br;
+      const gy = -tl - 2*tm - tr + bl + 2*bm + br;
+      const mag = Math.sqrt(gx*gx + gy*gy);
+      edges[y*w+x] = mag > threshold ? 255 : 0;
+    }
+  }
+  return edges;
+}
+
+function getEdgeThreshold(style, detail) {
+  // Lower threshold = more edges (more detail)
+  const base = { clean: 60, detailed: 35, bold: 90, intricate: 20 };
+  const b = base[style] || 60;
+  // detail slider 1-10: higher detail = lower threshold
+  return Math.max(10, b - (detail - 5) * 6);
+}
+
+function getLineWidth(style, lineWeightSlider) {
+  const base = { clean: 1.2, detailed: 0.8, bold: 2.0, intricate: 0.6 };
+  return (base[style] || 1.2) * lineWeightSlider * 0.6;
+}
+
+function drawEdges(ctx, edges, w, h, marginX, marginTop, lineWidth) {
+  ctx.fillStyle = 'black';
+  const lw = Math.max(1, Math.round(lineWidth));
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      if (edges[y*w+x] > 0) {
+        ctx.fillRect(x + marginX, y + marginTop + marginX, lw, lw);
+      }
+    }
+  }
+}
+
+function drawPageBorder(ctx, totalW, totalH, margin) {
+  // Outer decorative border
+  ctx.strokeStyle = '#222';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(margin * 0.35, margin * 0.35, totalW - margin * 0.7, totalH - margin * 0.7);
+
+  // Inner border
+  ctx.lineWidth = 1;
+  ctx.strokeRect(margin * 0.5, margin * 0.5, totalW - margin, totalH - margin);
+
+  // Title line at top
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = '#aaa';
+  ctx.beginPath();
+  ctx.moveTo(margin * 0.7, margin * 1.8);
+  ctx.lineTo(totalW - margin * 0.7, margin * 1.8);
+  ctx.stroke();
+
+  // "My Coloring Page" label
+  ctx.font = `${Math.round(margin * 0.55)}px Georgia, serif`;
+  ctx.fillStyle = '#bbb';
+  ctx.textAlign = 'center';
+  ctx.fillText('My Coloring Page', totalW / 2, margin * 1.45);
+}
+
+// ── Show result ───────────────────────────────────
+function showSingleResult(originalUrl, coloringPageDataUrl, tips, filename) {
+  // Show coloring page in preview
+  document.getElementById('preview-area').innerHTML =
+    `<img src="${coloringPageDataUrl}" alt="coloring page" style="max-height:320px;object-fit:contain;" />`;
+
+  // Before/After compare
+  const sec = document.getElementById('compare-section');
+  sec.classList.remove('hidden');
+  document.getElementById('compare-before').src = originalUrl;
+  document.getElementById('compare-after').src = coloringPageDataUrl;
+  document.getElementById('compare-overlay').style.width = '50%';
+  document.getElementById('compare-handle').style.left = '50%';
+
+  const shelf = document.getElementById('download-shelf');
+  shelf.classList.remove('hidden');
+  shelf.innerHTML = '';
+
+  // Download PNG
+  const pngLink = document.createElement('a');
+  pngLink.className = 'download-card';
+  pngLink.href = coloringPageDataUrl;
+  pngLink.download = filename.replace(/\.[^.]+$/, '') + '-coloring-page.png';
+  pngLink.innerHTML = '📥 Download PNG';
+  shelf.appendChild(pngLink);
+
+  // Print/PDF button
+  const pdfBtn = document.createElement('button');
+  pdfBtn.className = 'download-card';
+  pdfBtn.style.cursor = 'pointer';
+  pdfBtn.innerHTML = '📄 Print / Save as PDF';
+  pdfBtn.onclick = () => printAsPdf(coloringPageDataUrl, filename);
+  shelf.appendChild(pdfBtn);
+
+  // Tips placeholder — filled in async by showTips() / showTipsLoading() / hideTips()
+  const tipEl = document.createElement('div');
+  tipEl.id = 'tips-area';
+  tipEl.style.cssText = 'width:100%;margin-top:0.75rem;';
+  shelf.appendChild(tipEl);
+
+  // If tips were passed directly (e.g. from batch), show them now
+  if (tips) showTips(tips);
+}
+
+// ── Tips helpers ──────────────────────────────────
+function showTipsLoading() {
+  const el = document.getElementById('tips-area');
+  if (!el) return;
+  el.innerHTML = `<div style="padding:0.6rem 1rem;background:rgba(212,168,67,0.05);border:1px solid rgba(212,168,67,0.2);border-radius:3px;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:rgba(139,111,71,0.5);">
+    <span class="spinner" style="border-color:rgba(139,111,71,0.2);border-top-color:var(--sepia);"></span> Fetching AI coloring tips…
+  </div>`;
+}
+
+function showTips(text) {
+  const el = document.getElementById('tips-area');
+  if (!el) return;
+  el.innerHTML = `<div style="padding:0.75rem 1rem;background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.3);border-radius:3px;font-size:0.88rem;color:#6b5000;font-style:italic;">
+    <strong style="font-style:normal;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:0.4rem;color:var(--sepia)">✨ AI Coloring Tips</strong>
+    ${text}
+  </div>`;
+}
+
+function hideTips() {
+  const el = document.getElementById('tips-area');
+  if (el) el.innerHTML = '';
+}
+
+// ── Print-to-PDF helper ───────────────────────────
+function printAsPdf(dataUrl, filename) {
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html>
+<html><head><title>${filename} — Coloring Page</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:white; }
+  img { width:100%; height:auto; display:block; }
+  @page { size: letter portrait; margin: 0; }
+  @media print { body { print-color-adjust: exact; } }
+</style>
+</head><body>
+<img src="${dataUrl}" />
+<script>window.onload=()=>{window.print();window.onafterprint=()=>window.close();}<\/script>
+</body></html>`);
+  win.document.close();
+}
+
+function resetSingle() {
+  selectedFile = null;
+  document.getElementById('file-input').value = '';
+  document.getElementById('preview-area').innerHTML = `<div class="preview-empty"><span class="big">✏️</span><p>Your coloring page will appear here</p></div>`;
+  document.getElementById('compare-section').classList.add('hidden');
+  document.getElementById('download-shelf').classList.add('hidden');
+}
+
+// ── Batch queue ───────────────────────────────────
+function styleOptionsHtml(selected = 'clean') {
+  return STYLES.map(s => `<option value="${s.value}"${s.value===selected?' selected':''}>${s.label}</option>`).join('');
+}
+function addToQueue(file) {
+  const id = ++batchIdCounter;
+  batchQueue.push({ id, file, url: URL.createObjectURL(file), style: 'clean', status: 'pending' });
+  renderQueue();
+}
+function removeFromQueue(id) { batchQueue = batchQueue.filter(i => i.id !== id); renderQueue(); }
+function clearQueue() { batchQueue = []; renderQueue(); }
+function updateQueueItemStyle(id, style) { const i = batchQueue.find(i=>i.id===id); if(i) i.style=style; }
+
+function renderQueue() {
+  const list = document.getElementById('queue-list');
+  document.getElementById('queue-count').textContent = `${batchQueue.length} image${batchQueue.length!==1?'s':''}`;
+  if (!batchQueue.length) {
+    list.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(139,111,71,0.4);font-style:italic;font-size:0.9rem">Queue is empty — add images above</div>';
+    return;
+  }
+  list.innerHTML = batchQueue.map(item => `
+    <div class="queue-item" id="qi-${item.id}">
+      <img class="queue-thumb" src="${item.url}" alt="" />
+      <div class="queue-info">
+        <div class="queue-name">${item.file.name}</div>
+        <select class="queue-style-select" onchange="updateQueueItemStyle(${item.id},this.value)">
+          ${styleOptionsHtml(item.style)}
+        </select>
+      </div>
+      <span class="queue-status status-${item.status}">${item.status}</span>
+      <button class="queue-remove" onclick="removeFromQueue(${item.id})">×</button>
+    </div>`).join('');
+}
+
+// ── Set-all modal ─────────────────────────────────
+function openSetAllModal() {
+  if (!batchQueue.length) return toast('Queue is empty', 'error');
+  document.getElementById('style-modal').classList.remove('hidden');
+}
+function closeModal() { document.getElementById('style-modal').classList.add('hidden'); }
+function applyAllStyles() {
+  const style = document.getElementById('modal-style').value;
+  batchQueue.forEach(i => i.style = style);
+  renderQueue();
+  closeModal();
+  toast(`All images → ${STYLES.find(s=>s.value===style)?.label}`, 'success');
+}
+
+// ── Batch processing ──────────────────────────────
+async function runBatch() {
+  if (!batchQueue.length) return toast('Queue is empty', 'error');
+  const btn = document.getElementById('batch-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Processing…';
+
+  const pw = document.getElementById('batch-progress-wrap');
+  const pb = document.getElementById('batch-progress-bar');
+  const pt = document.getElementById('batch-progress-text');
+  pw.classList.remove('hidden'); pt.classList.remove('hidden');
+  pb.style.width = '0%';
+
+  const concurrency = parseInt(document.getElementById('concurrency').value);
+  const addBorder = document.getElementById('batch-border').checked;
+  const total = batchQueue.length;
+  let done = 0;
+  const results = [];
+
+  batchQueue.forEach(i => { i.status = 'pending'; });
+  renderQueue();
+
+  for (let i = 0; i < batchQueue.length; i += concurrency) {
+    const chunk = batchQueue.slice(i, i + concurrency);
+    await Promise.all(chunk.map(async item => {
+      setQueueStatus(item.id, 'processing');
+      try {
+        // Phase 1: render locally — fast, no network needed
+        const localUrl = URL.createObjectURL(item.file);
+        const coloringPageDataUrl = await renderColoringPage(
+          localUrl, item.style, 2, 6, addBorder
+        );
+        URL.revokeObjectURL(localUrl);
+        results.push({ item, coloringPageDataUrl, tips: null });
+        setQueueStatus(item.id, 'done');
+      } catch (e) {
+        console.error(e);
+        setQueueStatus(item.id, 'error');
+      }
+      done++;
+      pb.style.width = `${(done/total)*100}%`;
+      pt.textContent = `${done} / ${total} images processed`;
+    }));
+  }
+
+  // Phase 2: fetch Gemini tips for all successful results in background
+  renderBatchResults(results);
+  btn.disabled = false;
+  btn.textContent = 'Process All Images';
+  toast(`Done! ${results.length} of ${total} converted.`, 'success');
+
+  // Fire-and-forget tips fetch for each result
+  results.forEach(({ item }) => {
+    const fd = new FormData();
+    fd.append('image', item.file);
+    fd.append('style', item.style);
+    fetch('/api/convert', { method: 'POST', body: fd })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.coloringTips) {
+          const el = document.getElementById(`batch-tips-${item.id}`);
+          if (el) el.textContent = data.coloringTips;
+        }
+      })
+      .catch(() => {});
+  });
+  return; // early return — toast/button already handled above
+  // (the lines below are now unreachable but kept for safety)
+
+}
+
+function setQueueStatus(id, status) {
+  const item = batchQueue.find(i=>i.id===id);
+  if (item) item.status = status;
+  const el = document.querySelector(`#qi-${id} .queue-status`);
+  if (el) { el.className = `queue-status status-${status}`; el.textContent = status; }
+}
+
+function renderBatchResults(results) {
+  const container = document.getElementById('batch-results');
+  container.innerHTML = '';
+  results.forEach(({ item, coloringPageDataUrl }) => {
+    const baseName = item.file.name.replace(/\.[^.]+$/, '');
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;gap:1rem;align-items:center;padding:0.75rem;background:var(--paper);border-radius:3px;border:1px solid rgba(139,111,71,0.15)';
+    div.innerHTML = `
+      <img src="${coloringPageDataUrl}" style="width:72px;height:72px;object-fit:cover;border-radius:3px;flex-shrink:0;" />
+      <div style="flex:1;min-width:0">
+        <div style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--sepia);margin-bottom:0.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.file.name}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.62rem;color:rgba(139,111,71,0.6);margin-bottom:0.5rem">${STYLES.find(s=>s.value===item.style)?.label}</div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.4rem" id="batch-dl-${item.id}"></div>
+        <div id="batch-tips-${item.id}" style="font-size:0.78rem;color:#6b5000;font-style:italic;line-height:1.4;"></div>
+      </div>`;
+    container.appendChild(div);
+
+    // PNG download
+    const a = document.createElement('a');
+    a.className = 'download-card';
+    a.href = coloringPageDataUrl;
+    a.download = baseName + '-coloring-page.png';
+    a.style.cssText = 'font-size:0.65rem;padding:0.3rem 0.7rem';
+    a.textContent = '📥 PNG';
+    document.getElementById(`batch-dl-${item.id}`).appendChild(a);
+
+    // PDF print button
+    const btn = document.createElement('button');
+    btn.className = 'download-card';
+    btn.style.cssText = 'font-size:0.65rem;padding:0.3rem 0.7rem;cursor:pointer';
+    btn.textContent = '📄 PDF';
+    btn.onclick = () => printAsPdf(coloringPageDataUrl, item.file.name);
+    document.getElementById(`batch-dl-${item.id}`).appendChild(btn);
+  });
+  document.getElementById('batch-preview').classList.remove('hidden');
+}
+
+// ── Compare slider ────────────────────────────────
+function startCompare(e) {
+  isComparing = true;
+  const move = ev => {
+    if (!isComparing) return;
+    const rect = document.getElementById('compare-wrap').getBoundingClientRect();
+    const t = ev.touches ? ev.touches[0] : ev;
+    const pct = Math.max(0, Math.min(100, ((t.clientX - rect.left) / rect.width) * 100));
+    document.getElementById('compare-overlay').style.width = pct + '%';
+    document.getElementById('compare-handle').style.left = pct + '%';
+  };
+  document.addEventListener('mousemove', move);
+  document.addEventListener('mouseup', () => { isComparing = false; }, { once: true });
+  document.addEventListener('touchmove', move, { passive: true });
+  document.addEventListener('touchend', () => { isComparing = false; }, { once: true });
+}
+
+// ── Toast ─────────────────────────────────────────
+let toastTimer;
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = ''; }, 3500);
+}
+</script>
+</body>
+</html>
