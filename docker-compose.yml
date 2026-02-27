@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+  colorcraft:
+    image: colorcraft-studio:latest
+    # ── To pull from Docker Hub once published, replace the above with:
+    # image: yourdockerhubusername/colorcraft-studio:latest
+    #
+    # ── To build locally from source instead of pulling an image:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: colorcraft-studio
+    restart: unless-stopped
+
+    ports:
+      - "${PORT:-3000}:3000"
+
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      # ── Gemini AI tips (optional — app works fine without this)
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.0-flash}
+
+    # ── Resource limits (sensible defaults for a small VPS)
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+        reservations:
+          memory: 64M
+
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/convert"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# ── No volumes needed — the app is stateless.
+# ── Images are processed in-memory and returned to the browser.
+# ── If you add R2/S3 storage later, add credentials here.
