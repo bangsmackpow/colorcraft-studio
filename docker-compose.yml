@@ -2,13 +2,14 @@ version: "3.8"
 
 services:
   colorcraft:
-    image: ghcr.io/bangsmackpow/colorcraft-studio:latest
+    image: ghcr.io/YOUR_GITHUB_USERNAME/colorcraft-studio:latest
     container_name: colorcraft-studio
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
+      - APP_NAME=${APP_NAME:-ColorCraft Studio}
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.0-flash}
     deploy:

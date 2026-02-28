@@ -9,6 +9,7 @@
  * The coloring page itself is rendered entirely client-side via Canvas.
  *
  * Environment variables:
+ *   APP_NAME        — optional. Replaces "ColorCraft Studio" in the UI.
  *   GEMINI_API_KEY  — optional. If present, adds AI coloring tips.
  *   GEMINI_MODEL    — optional. Defaults to gemini-2.0-flash. Set this in
  *                     .dev.vars to use whatever model works on your account.
@@ -28,8 +29,9 @@ export async function onRequestPost(context) {
   return corsResponse(await handleConvert(request, env));
 }
 
-export async function onRequestGet() {
-  return corsResponse(new Response(JSON.stringify({ status: 'ok' }), {
+export async function onRequestGet(context) {
+  const { env } = context;
+  return corsResponse(new Response(JSON.stringify({ status: 'ok', appName: env.APP_NAME || null }), {
     headers: { 'Content-Type': 'application/json' },
   }));
 }
@@ -115,6 +117,7 @@ async function handleConvert(request, env) {
       imageDataUrl,
       originalUrl,
       coloringTips, // null if Gemini unavailable — frontend handles gracefully
+      appName: env.APP_NAME || null,
     });
 
   } catch (err) {

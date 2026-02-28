@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ColorCraft Studio</title>
+  <title>{{APP_NAME}}</title>
+  <meta name="app-name" content="{{APP_NAME}}" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
   <style>
@@ -165,7 +166,7 @@
 <body>
 
 <header>
-  <div class="wordmark">Color<span>Craft</span> Studio</div>
+  <div class="wordmark" id="app-wordmark">Color<span>Craft</span> Studio</div>
   <div class="tagline">Photo → Coloring Page · PNG &amp; PDF Output</div>
 </header>
 
@@ -233,17 +234,32 @@
             </div>
           </div>
           <div class="setting-row">
+            <label class="setting-label">Print Size</label>
+            <select id="print-size" style="font-family:'DM Mono',monospace;font-size:0.72rem;padding:0.45rem 0.7rem;border:1px solid rgba(139,111,71,0.3);border-radius:3px;background:var(--paper);color:var(--ink);cursor:pointer;width:100%;">
+              <option value="full">Full page — 8.5 × 11"</option>
+              <option value="half-landscape">Half page landscape — 11 × 4.25"</option>
+              <option value="half-portrait">Half page portrait — 5.5 × 8.5"</option>
+              <option value="quarter">Quarter page — 5.5 × 4.25"</option>
+              <option value="a4">A4 — 210 × 297mm</option>
+            </select>
+          </div>
+          <div class="setting-row">
             <label class="setting-label">Output</label>
             <div class="output-badges">
               <span class="output-badge">✓ PNG image</span>
-              <span class="output-badge">✓ PDF 8.5 × 11"</span>
+              <span class="output-badge">✓ Print to PDF</span>
             </div>
           </div>
           <div class="setting-row">
             <label class="check-item">
-              <input type="checkbox" id="border" checked />
+              <input type="checkbox" id="border" checked onchange="togglePageTitleInput()" />
               Add decorative border &amp; title area
             </label>
+            <div id="page-title-wrap" style="margin-top:0.6rem;">
+              <input type="text" id="page-title" placeholder="My Coloring Page"
+                style="width:100%;font-family:'Crimson Pro',serif;font-size:0.95rem;padding:0.45rem 0.7rem;border:1px solid rgba(139,111,71,0.3);border-radius:3px;background:var(--paper);color:var(--ink);" />
+              <div style="font-family:'DM Mono',monospace;font-size:0.62rem;color:rgba(139,111,71,0.5);margin-top:0.3rem;letter-spacing:0.05em;">Title printed at top of coloring page</div>
+            </div>
           </div>
         </div>
 
@@ -296,9 +312,14 @@
           </div>
           <div class="setting-row">
             <label class="check-item">
-              <input type="checkbox" id="batch-border" checked />
+              <input type="checkbox" id="batch-border" checked onchange="toggleBatchPageTitleInput()" />
               Add decorative border &amp; title area to all pages
             </label>
+            <div id="batch-page-title-wrap" style="margin-top:0.6rem;">
+              <input type="text" id="batch-page-title" placeholder="My Coloring Page"
+                style="width:100%;font-family:'Crimson Pro',serif;font-size:0.95rem;padding:0.45rem 0.7rem;border:1px solid rgba(139,111,71,0.3);border-radius:3px;background:var(--paper);color:var(--ink);" />
+              <div style="font-family:'DM Mono',monospace;font-size:0.62rem;color:rgba(139,111,71,0.5);margin-top:0.3rem;letter-spacing:0.05em;">Applied to all pages in batch</div>
+            </div>
           </div>
           <div class="setting-row">
             <label class="setting-label">Concurrency</label>
@@ -395,6 +416,45 @@ let batchQueue = [];
 let batchIdCounter = 0;
 let isComparing = false;
 
+// ── App name — configurable via server (Docker: APP_NAME env, CF: APP_NAME secret)
+function applyAppName(name) {
+  if (!name || name === '{{APP_NAME}}') name = 'ColorCraft Studio';
+  document.title = name;
+  const wordmark = document.getElementById('app-wordmark');
+  if (!wordmark) return;
+  const parts = name.split(' ');
+  if (parts.length >= 2) {
+    const last = parts.pop();
+    wordmark.innerHTML = `${parts.join(' ')} <span>${last}</span>`;
+  } else {
+    wordmark.textContent = name;
+  }
+}
+
+// Apply immediately from meta tag (set by Docker/Express server-side injection)
+(function() {
+  const meta = document.querySelector('meta[name="app-name"]');
+  applyAppName(meta ? meta.getAttribute('content') : null);
+})();
+
+// Also fetch from API on load — picks up APP_NAME on Cloudflare Pages
+fetch('/api/convert').then(r => r.json()).then(data => {
+  if (data.appName) applyAppName(data.appName);
+}).catch(() => {});
+
+// ── Toggle page title input visibility ────────────────────────────────────────
+function togglePageTitleInput() {
+  const wrap = document.getElementById('page-title-wrap');
+  const checked = document.getElementById('border').checked;
+  if (wrap) wrap.style.display = checked ? '' : 'none';
+}
+
+function toggleBatchPageTitleInput() {
+  const wrap = document.getElementById('batch-page-title-wrap');
+  const checked = document.getElementById('batch-border').checked;
+  if (wrap) wrap.style.display = checked ? '' : 'none';
+}
+
 // ── Mode ──────────────────────────────────────────
 function setMode(mode) {
   currentMode = mode;
@@ -459,8 +519,10 @@ async function convertSingle() {
     // ── Phase 1: Render coloring page immediately from local file ──
     // No network call needed — canvas processes the image right in the browser.
     const localDataUrl = URL.createObjectURL(selectedFile);
+    const pageTitle = addBorder ? (document.getElementById('page-title').value.trim() || 'My Coloring Page') : '';
+    const printSize = document.getElementById('print-size').value;
     const coloringPageDataUrl = await renderColoringPage(
-      localDataUrl, selectedStyle, lineWeight, detail, addBorder
+      localDataUrl, selectedStyle, lineWeight, detail, addBorder, pageTitle, printSize
     );
     URL.revokeObjectURL(localDataUrl);
 
@@ -495,7 +557,7 @@ async function convertSingle() {
 }
 
 // ── Canvas-based coloring page renderer ──────────────────────────────────────
-async function renderColoringPage(imageDataUrl, style, lineWeight, detail, addBorder) {
+async function renderColoringPage(imageDataUrl, style, lineWeight, detail, addBorder, pageTitle, printSize) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
@@ -526,22 +588,45 @@ async function renderColoringPage(imageDataUrl, style, lineWeight, detail, addBo
         // ── Step 5: Render as black lines on white ──
         const outCanvas = document.createElement('canvas');
         const margin = addBorder ? 80 : 0;
-        outCanvas.width  = w + margin * 2;
-        outCanvas.height = h + margin * 2 + (addBorder ? 60 : 0);
+        const titleArea = addBorder ? 60 : 0;
+
+        // Scale canvas to match chosen print size at 150dpi
+        const pagePx = getPrintSizePixels(printSize || 'full');
+        const imgAspect = (w + margin * 2) / (h + margin * 2 + titleArea);
+        const pageAspect = pagePx.w / pagePx.h;
+
+        // Fit the image into the page, letterboxing if necessary
+        let drawW, drawH;
+        if (imgAspect > pageAspect) {
+          drawW = pagePx.w;
+          drawH = Math.round(pagePx.w / imgAspect);
+        } else {
+          drawH = pagePx.h;
+          drawW = Math.round(pagePx.h * imgAspect);
+        }
+
+        outCanvas.width  = pagePx.w;
+        outCanvas.height = pagePx.h;
         const outCtx = outCanvas.getContext('2d');
 
         // White background
         outCtx.fillStyle = 'white';
         outCtx.fillRect(0, 0, outCanvas.width, outCanvas.height);
 
+        // Center the image on the page
+        const offsetX = Math.round((pagePx.w - drawW) / 2);
+        const offsetY = Math.round((pagePx.h - drawH) / 2);
+
         // Draw border & title area if requested
+        const scaledMargin = Math.round(margin * drawW / (w + margin * 2));
+        const scaledTitleArea = Math.round(titleArea * drawH / (h + margin * 2 + titleArea));
         if (addBorder) {
-          drawPageBorder(outCtx, outCanvas.width, outCanvas.height, margin);
+          drawPageBorder(outCtx, drawW, drawH, scaledMargin, pageTitle || 'My Coloring Page', offsetX, offsetY);
         }
 
-        // Draw edge pixels as black lines
+        // Draw edge pixels scaled to fit
         const lw = getLineWidth(style, lineWeight);
-        drawEdges(outCtx, edges, w, h, margin, addBorder ? 60 : 0, lw);
+        drawEdgesScaled(outCtx, edges, w, h, scaledMargin, addBorder ? scaledTitleArea : 0, lw, drawW, drawH, offsetX, offsetY);
 
         resolve(outCanvas.toDataURL('image/png'));
       } catch (e) { reject(e); }
@@ -613,41 +698,65 @@ function getLineWidth(style, lineWeightSlider) {
   return (base[style] || 1.2) * lineWeightSlider * 0.6;
 }
 
-function drawEdges(ctx, edges, w, h, marginX, marginTop, lineWidth) {
+// ── Print size → pixel dimensions at 150dpi ──────────────────────────────────
+function getPrintSizePixels(size) {
+  const DPI = 150;
+  const sizes = {
+    'full':           { w: Math.round(8.5 * DPI),  h: Math.round(11   * DPI) },
+    'half-landscape': { w: Math.round(11  * DPI),  h: Math.round(4.25 * DPI) },
+    'half-portrait':  { w: Math.round(5.5 * DPI),  h: Math.round(8.5  * DPI) },
+    'quarter':        { w: Math.round(5.5 * DPI),  h: Math.round(4.25 * DPI) },
+    'a4':             { w: Math.round(8.27* DPI),  h: Math.round(11.69* DPI) },
+  };
+  return sizes[size] || sizes['full'];
+}
+
+// ── Draw edges scaled into the target draw area ───────────────────────────────
+function drawEdgesScaled(ctx, edges, srcW, srcH, marginX, marginTop, lineWidth, drawW, drawH, offsetX, offsetY) {
   ctx.fillStyle = 'black';
   const lw = Math.max(1, Math.round(lineWidth));
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      if (edges[y*w+x] > 0) {
-        ctx.fillRect(x + marginX, y + marginTop + marginX, lw, lw);
+  const imgDrawW = drawW - marginX * 2;
+  const imgDrawH = drawH - marginX * 2 - marginTop;
+  const scaleX = imgDrawW / srcW;
+  const scaleY = imgDrawH / srcH;
+  for (let y = 0; y < srcH; y++) {
+    for (let x = 0; x < srcW; x++) {
+      if (edges[y * srcW + x] > 0) {
+        const px = offsetX + marginX + Math.round(x * scaleX);
+        const py = offsetY + marginTop + marginX + Math.round(y * scaleY);
+        ctx.fillRect(px, py, lw, lw);
       }
     }
   }
 }
 
-function drawPageBorder(ctx, totalW, totalH, margin) {
+// ── Draw decorative border with custom title ───────────────────────────────────
+function drawPageBorder(ctx, totalW, totalH, margin, title, offsetX, offsetY) {
+  const ox = offsetX || 0;
+  const oy = offsetY || 0;
+  const t  = title || 'My Coloring Page';
+
   // Outer decorative border
   ctx.strokeStyle = '#222';
   ctx.lineWidth = 3;
-  ctx.strokeRect(margin * 0.35, margin * 0.35, totalW - margin * 0.7, totalH - margin * 0.7);
+  ctx.strokeRect(ox + margin * 0.35, oy + margin * 0.35, totalW - margin * 0.7, totalH - margin * 0.7);
 
   // Inner border
   ctx.lineWidth = 1;
-  ctx.strokeRect(margin * 0.5, margin * 0.5, totalW - margin, totalH - margin);
+  ctx.strokeRect(ox + margin * 0.5, oy + margin * 0.5, totalW - margin, totalH - margin);
 
-  // Title line at top
-  ctx.lineWidth = 1;
+  // Title separator line
   ctx.strokeStyle = '#aaa';
   ctx.beginPath();
-  ctx.moveTo(margin * 0.7, margin * 1.8);
-  ctx.lineTo(totalW - margin * 0.7, margin * 1.8);
+  ctx.moveTo(ox + margin * 0.7, oy + margin * 1.8);
+  ctx.lineTo(ox + totalW - margin * 0.7, oy + margin * 1.8);
   ctx.stroke();
 
-  // "My Coloring Page" label
+  // Title text
   ctx.font = `${Math.round(margin * 0.55)}px Georgia, serif`;
-  ctx.fillStyle = '#bbb';
+  ctx.fillStyle = '#888';
   ctx.textAlign = 'center';
-  ctx.fillText('My Coloring Page', totalW / 2, margin * 1.45);
+  ctx.fillText(t, ox + totalW / 2, oy + margin * 1.45);
 }
 
 // ── Show result ───────────────────────────────────
@@ -821,8 +930,9 @@ async function runBatch() {
       try {
         // Phase 1: render locally — fast, no network needed
         const localUrl = URL.createObjectURL(item.file);
+        const batchPageTitle = addBorder ? (document.getElementById('batch-page-title').value.trim() || 'My Coloring Page') : '';
         const coloringPageDataUrl = await renderColoringPage(
-          localUrl, item.style, 2, 6, addBorder
+          localUrl, item.style, 2, 6, addBorder, batchPageTitle, 'full'
         );
         URL.revokeObjectURL(localUrl);
         results.push({ item, coloringPageDataUrl, tips: null });

@@ -42,7 +42,21 @@ app.use((req, res, next) => {
   next();
 });
 
-// ─── Static files ─────────────────────────────────────────────────────────────
+// ─── Static files with APP_NAME injection ─────────────────────────────────────
+// Serve index.html with {{APP_NAME}} replaced so the header/title are configurable
+// without touching the source file. All other static files served normally.
+const fs = require('fs');
+
+const APP_NAME = process.env.APP_NAME || 'ColorCraft Studio';
+const indexPath = path.join(__dirname, '..', 'public', 'index.html');
+
+app.get('/', (req, res) => {
+  const html = fs.readFileSync(indexPath, 'utf8')
+    .replaceAll('{{APP_NAME}}', APP_NAME);
+  res.setHeader('Content-Type', 'text/html');
+  res.send(html);
+});
+
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // ─── Health check ─────────────────────────────────────────────────────────────
@@ -145,7 +159,7 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════╗
-║      ColorCraft Studio — Server       ║
+║  ${APP_NAME.slice(0,36).padEnd(36)} ║
 ╠════════════════════════════════════════╣
 ║  http://localhost:${String(PORT).padEnd(21)}║
 ║  Gemini tips: ${GEMINI_KEY ? 'enabled ✓' : 'disabled (no key)'}${' '.repeat(GEMINI_KEY ? 15 : 8)}║
