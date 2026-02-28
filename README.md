@@ -56,11 +56,9 @@ This is the recommended path for self-hosters. The image is built automatically 
 3. Paste the following into the compose editor, filling in your values:
 
 ```yaml
-version: "3.8"
-
 services:
   colorcraft:
-    image: ghcr.io/YOUR_GITHUB_USERNAME/colorcraft-studio:latest
+    image: ghcr.io/bangsmackpow/colorcraft-studio:latest
     container_name: colorcraft-studio
     restart: unless-stopped
     ports:
@@ -113,7 +111,7 @@ docker compose pull && docker compose up -d
 ### Build and run locally with Docker
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/colorcraft-studio.git
+git clone https://github.com/bangsmackpow/colorcraft-studio.git
 cd colorcraft-studio
 
 # Copy the example env file and fill in your values
@@ -157,7 +155,7 @@ wrangler login
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_GITHUB_USERNAME/colorcraft-studio.git
+git clone https://github.com/bangsmackpow/colorcraft-studio.git
 cd colorcraft-studio
 
 # Create the Pages project (first time only)
@@ -290,11 +288,9 @@ yourdomain.com {
 Add labels to the container in your `docker-compose.yml`. Traefik must be running and connected to the same Docker network.
 
 ```yaml
-version: "3.8"
-
 services:
   colorcraft:
-    image: ghcr.io/YOUR_GITHUB_USERNAME/colorcraft-studio:latest
+    image: ghcr.io/bangsmackpow/colorcraft-studio:latest
     container_name: colorcraft-studio
     restart: unless-stopped
     # Remove the ports: block when using Traefik — Traefik routes directly to the container
@@ -348,7 +344,7 @@ NPM will obtain a certificate and your app will be live at `https://colorcraft.y
 ### With Node.js (Express server)
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/colorcraft-studio.git
+git clone https://github.com/bangsmackpow/colorcraft-studio.git
 cd colorcraft-studio
 
 npm install
