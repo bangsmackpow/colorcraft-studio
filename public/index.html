@@ -18,9 +18,7 @@
       --gold: #d4a843;
       --shadow: rgba(26,16,8,0.12);
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       background: var(--paper);
       color: var(--ink);
@@ -31,11 +29,8 @@
         radial-gradient(ellipse at 80% 100%, rgba(196,82,42,0.06) 0%, transparent 50%),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
     }
-
     header {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
+      display: flex; align-items: baseline; justify-content: space-between;
       padding: 2.5rem 4rem 1.5rem;
       border-bottom: 1px solid rgba(139,111,71,0.25);
     }
@@ -43,10 +38,11 @@
     .wordmark span { color: var(--rust); }
     .tagline { font-family: 'DM Mono', monospace; font-size: 0.7rem; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sepia); }
 
+    /* ── Mode bar ── */
     .mode-bar { display: flex; padding: 2rem 4rem 0; }
     .mode-btn { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.7rem 2rem; border: 1px solid rgba(139,111,71,0.3); background: transparent; color: var(--sepia); cursor: pointer; transition: all 0.2s; }
     .mode-btn:first-child { border-radius: 3px 0 0 3px; }
-    .mode-btn:last-child { border-radius: 0 3px 3px 0; border-left: none; }
+    .mode-btn:last-child  { border-radius: 0 3px 3px 0; border-left: none; }
     .mode-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
     main { padding: 2.5rem 4rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; max-width: 1400px; }
@@ -55,20 +51,21 @@
       main { grid-template-columns: 1fr; }
     }
 
+    /* ── Panels ── */
     .panel { background: white; border: 1px solid rgba(139,111,71,0.2); border-radius: 6px; padding: 2rem; box-shadow: 0 2px 20px var(--shadow); }
     .panel + .panel { margin-top: 1.5rem; }
     .panel-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--cream); display: flex; align-items: center; gap: 0.5rem; }
     .panel-title .num { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--rust); background: rgba(196,82,42,0.08); padding: 0.2rem 0.5rem; border-radius: 2px; }
 
-    /* Drop zone */
+    /* ── Drop zone ── */
     .drop-zone { border: 2px dashed rgba(139,111,71,0.35); border-radius: 4px; padding: 3rem 2rem; text-align: center; cursor: pointer; transition: all 0.25s; position: relative; }
     .drop-zone:hover, .drop-zone.dragover { border-color: var(--rust); background: rgba(196,82,42,0.03); }
     .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
     .drop-icon { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; opacity: 0.4; }
     .drop-text { font-size: 1rem; color: var(--sepia); }
-    .drop-sub { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: rgba(139,111,71,0.6); margin-top: 0.4rem; }
+    .drop-sub  { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: rgba(139,111,71,0.6); margin-top: 0.4rem; }
 
-    /* Style cards */
+    /* ── Style cards ── */
     .style-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1.4rem; }
     .style-card { border: 1.5px solid rgba(139,111,71,0.25); border-radius: 4px; padding: 0.85rem 0.9rem; cursor: pointer; transition: all 0.18s; position: relative; }
     .style-card:hover { border-color: var(--sepia); background: rgba(139,111,71,0.03); }
@@ -77,22 +74,39 @@
     .style-card-name { font-family: 'Playfair Display', serif; font-size: 0.88rem; font-weight: 700; margin-bottom: 0.25rem; }
     .style-card-desc { font-size: 0.78rem; color: var(--sepia); font-style: italic; line-height: 1.4; }
 
-    /* Settings */
+    /* ── Form elements ── */
     .settings-grid { display: grid; gap: 1.2rem; }
     .setting-row { display: flex; flex-direction: column; gap: 0.4rem; }
     .setting-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sepia); }
     .slider-row { display: flex; align-items: center; gap: 0.8rem; }
     input[type="range"] { flex: 1; accent-color: var(--rust); height: 3px; }
     .slider-val { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--sepia); width: 2.5rem; text-align: right; }
-
-    /* Output badges */
-    .output-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-    .output-badge { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.75rem; border-radius: 2px; background: rgba(107,143,113,0.12); color: #3d6b42; border: 1px solid rgba(107,143,113,0.3); }
-
+    input[type="text"], input[type="password"], select, textarea {
+      width: 100%; font-family: 'Crimson Pro', serif; font-size: 0.95rem;
+      padding: 0.45rem 0.7rem; border: 1px solid rgba(139,111,71,0.3);
+      border-radius: 3px; background: var(--paper); color: var(--ink);
+    }
+    select { font-family: 'DM Mono', monospace; font-size: 0.72rem; cursor: pointer; }
     .check-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.92rem; cursor: pointer; }
     .check-item input[type="checkbox"] { accent-color: var(--rust); width: 14px; height: 14px; }
 
-    /* Queue */
+    /* ── Buttons ── */
+    .btn { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.8rem 1.8rem; border: none; border-radius: 3px; cursor: pointer; transition: all 0.2s; }
+    .btn-primary   { background: var(--ink); color: var(--paper); }
+    .btn-primary:hover { background: #2d1f0f; }
+    .btn-primary:disabled { background: rgba(26,16,8,0.25); cursor: not-allowed; }
+    .btn-secondary { background: transparent; color: var(--sepia); border: 1px solid rgba(139,111,71,0.35); }
+    .btn-secondary:hover { border-color: var(--sepia); }
+    .btn-danger    { background: transparent; color: var(--rust); border: 1px solid rgba(196,82,42,0.3); }
+    .btn-sm        { padding: 0.45rem 1rem; font-size: 0.65rem; }
+    .btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }
+
+    /* ── Output badges ── */
+    .output-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .output-badge { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.75rem; border-radius: 2px; background: rgba(107,143,113,0.12); color: #3d6b42; border: 1px solid rgba(107,143,113,0.3); }
+    .ai-badge { background: rgba(212,168,67,0.12); color: #8a6b00; border: 1px solid rgba(212,168,67,0.35); }
+
+    /* ── Queue ── */
     .queue-list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 280px; overflow-y: auto; margin-bottom: 1rem; }
     .queue-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.8rem; background: var(--paper); border: 1px solid rgba(139,111,71,0.15); border-radius: 3px; }
     .queue-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 2px; border: 1px solid rgba(139,111,71,0.2); flex-shrink: 0; background: var(--cream); }
@@ -100,67 +114,90 @@
     .queue-name { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--sepia); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .queue-style-select { font-family: 'DM Mono', monospace; font-size: 0.65rem; padding: 0.2rem 0.4rem; border: 1px solid rgba(139,111,71,0.25); border-radius: 2px; background: white; color: var(--ink); margin-top: 0.3rem; width: 100%; cursor: pointer; }
     .queue-status { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em; padding: 0.2rem 0.5rem; border-radius: 2px; flex-shrink: 0; }
-    .status-pending { background: rgba(139,111,71,0.1); color: var(--sepia); }
+    .status-pending    { background: rgba(139,111,71,0.1);  color: var(--sepia); }
     .status-processing { background: rgba(212,168,67,0.15); color: #8a6b00; }
-    .status-done { background: rgba(107,143,113,0.15); color: #3d6b42; }
-    .status-error { background: rgba(196,82,42,0.12); color: var(--rust); }
+    .status-done       { background: rgba(107,143,113,0.15); color: #3d6b42; }
+    .status-error      { background: rgba(196,82,42,0.12);  color: var(--rust); }
     .queue-remove { background: none; border: none; cursor: pointer; color: rgba(139,111,71,0.4); font-size: 1rem; line-height: 1; padding: 0 0.2rem; transition: color 0.15s; flex-shrink: 0; }
     .queue-remove:hover { color: var(--rust); }
 
-    /* Buttons */
-    .btn { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.8rem 1.8rem; border: none; border-radius: 3px; cursor: pointer; transition: all 0.2s; }
-    .btn-primary { background: var(--ink); color: var(--paper); }
-    .btn-primary:hover { background: #2d1f0f; }
-    .btn-primary:disabled { background: rgba(26,16,8,0.25); cursor: not-allowed; }
-    .btn-secondary { background: transparent; color: var(--sepia); border: 1px solid rgba(139,111,71,0.35); }
-    .btn-secondary:hover { border-color: var(--sepia); }
-    .btn-danger { background: transparent; color: var(--rust); border: 1px solid rgba(196,82,42,0.3); }
-    .btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }
-
-    /* Preview */
+    /* ── Preview ── */
     .preview-area { min-height: 280px; background: var(--cream); border-radius: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(139,111,71,0.15); }
     .preview-area img { max-width: 100%; max-height: 380px; object-fit: contain; }
     .preview-empty { text-align: center; color: rgba(139,111,71,0.45); }
     .preview-empty .big { font-size: 3rem; display: block; margin-bottom: 0.5rem; }
     .preview-empty p { font-size: 0.9rem; font-style: italic; }
 
-    /* Compare */
+    /* ── Compare slider ── */
     .compare-wrap { position: relative; width: 100%; cursor: ew-resize; user-select: none; }
     .compare-wrap img { display: block; width: 100%; }
     .compare-overlay { position: absolute; top: 0; left: 0; height: 100%; overflow: hidden; border-right: 2px solid var(--rust); }
     .compare-overlay img { position: absolute; top: 0; left: 0; width: 100%; display: block; }
-    .compare-handle { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 32px; height: 32px; background: var(--rust); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .compare-handle { position: absolute; top: 50%; transform: translate(-50%,-50%); width: 32px; height: 32px; background: var(--rust); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
 
-    /* Downloads */
+    /* ── Downloads ── */
     .download-shelf { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; }
     .download-card { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; border: 1px solid rgba(107,143,113,0.4); border-radius: 3px; background: rgba(107,143,113,0.06); text-decoration: none; color: #3d6b42; font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; transition: all 0.2s; }
     .download-card:hover { background: rgba(107,143,113,0.14); }
 
-    /* Progress */
+    /* ── Progress ── */
     .progress-bar-wrap { margin-top: 1rem; background: var(--cream); border-radius: 2px; height: 4px; overflow: hidden; }
     .progress-bar { height: 100%; background: linear-gradient(90deg, var(--rust), var(--gold)); width: 0%; transition: width 0.3s ease; border-radius: 2px; }
     .progress-text { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--sepia); margin-top: 0.4rem; }
 
-    /* API Banner */
-    .api-banner { background: rgba(212,168,67,0.1); border: 1px solid rgba(212,168,67,0.4); border-radius: 4px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 0.75rem; }
-    .api-banner p { font-size: 0.88rem; color: #6b5000; line-height: 1.5; }
-    .api-banner code { font-family: 'DM Mono', monospace; font-size: 0.78rem; background: rgba(212,168,67,0.15); padding: 0.1rem 0.3rem; border-radius: 2px; }
-
-    /* Toast */
+    /* ── Toast ── */
     #toast { position: fixed; bottom: 2rem; right: 2rem; padding: 0.85rem 1.5rem; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; opacity: 0; transform: translateY(10px); transition: all 0.25s; pointer-events: none; z-index: 1000; }
     #toast.show { opacity: 1; transform: translateY(0); }
     #toast.success { background: #3d6b42; color: white; }
-    #toast.error { background: var(--rust); color: white; }
+    #toast.error   { background: var(--rust); color: white; }
+    #toast.info    { background: var(--sepia); color: white; }
 
     .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 0.4rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .hidden { display: none !important; }
 
-    /* Modal */
+    /* ── Modal ── */
     .modal-backdrop { position: fixed; inset: 0; background: rgba(26,16,8,0.5); z-index: 200; display: flex; align-items: center; justify-content: center; }
-    .modal-box { background: white; border-radius: 6px; padding: 2rem; width: 320px; box-shadow: 0 8px 40px rgba(0,0,0,0.2); }
+    .modal-box { background: white; border-radius: 6px; padding: 2rem; width: 340px; box-shadow: 0 8px 40px rgba(0,0,0,0.2); }
     .modal-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; }
-    .modal-select { width: 100%; font-family: 'Crimson Pro', serif; font-size: 0.95rem; padding: 0.55rem 0.8rem; border: 1px solid rgba(139,111,71,0.3); border-radius: 3px; margin-bottom: 1rem; background: var(--paper); color: var(--ink); }
+
+    /* ── Settings tab specific ── */
+    .settings-section { margin-bottom: 2rem; }
+    .settings-section-title {
+      font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700;
+      margin-bottom: 1rem; padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--cream); color: var(--ink);
+    }
+    .ai-status-pill {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em;
+      padding: 0.25rem 0.65rem; border-radius: 20px; margin-left: 0.5rem;
+    }
+    .ai-status-pill.active   { background: rgba(107,143,113,0.15); color: #3d6b42; border: 1px solid rgba(107,143,113,0.35); }
+    .ai-status-pill.inactive { background: rgba(139,111,71,0.1);   color: var(--sepia); border: 1px solid rgba(139,111,71,0.25); }
+    .quota-display {
+      font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.05em;
+      padding: 0.75rem 1rem; background: rgba(212,168,67,0.08);
+      border: 1px solid rgba(212,168,67,0.3); border-radius: 4px; margin-top: 0.75rem;
+      line-height: 1.7; color: #6b5000;
+    }
+    .quota-display strong { color: var(--ink); }
+    .quota-row { display: flex; justify-content: space-between; align-items: center; }
+    .key-input-wrap { position: relative; }
+    .key-input-wrap input { padding-right: 3rem; font-family: 'DM Mono', monospace; font-size: 0.78rem; }
+    .key-toggle { position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--sepia); font-size: 0.85rem; padding: 0.2rem; }
+    .tips-card {
+      padding: 0.75rem 1rem; background: rgba(212,168,67,0.08);
+      border: 1px solid rgba(212,168,67,0.3); border-radius: 3px;
+      font-size: 0.88rem; color: #6b5000; font-style: italic;
+    }
+    .tips-card strong { font-style: normal; font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 0.4rem; color: var(--sepia); }
+    .tips-loading {
+      padding: 0.6rem 1rem; background: rgba(212,168,67,0.05);
+      border: 1px solid rgba(212,168,67,0.2); border-radius: 3px;
+      font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em;
+      color: rgba(139,111,71,0.5);
+    }
   </style>
 </head>
 <body>
@@ -171,14 +208,16 @@
 </header>
 
 <div class="mode-bar">
-  <button class="mode-btn active" onclick="setMode('single')" id="btn-single">Single Image</button>
-  <button class="mode-btn" onclick="setMode('batch')" id="btn-batch">Batch Mode</button>
+  <button class="mode-btn active" onclick="setMode('single')"   id="btn-single">Single Image</button>
+  <button class="mode-btn"        onclick="setMode('batch')"    id="btn-batch">Batch Mode</button>
+  <button class="mode-btn"        onclick="setMode('settings')" id="btn-settings">⚙ Settings</button>
 </div>
 
 <main>
 
-  <!-- LEFT COLUMN -->
+  <!-- ═══ LEFT COLUMN ═══ -->
   <div>
+
     <!-- ── SINGLE MODE ── -->
     <div id="single-mode">
       <div class="panel">
@@ -196,7 +235,6 @@
 
       <div class="panel">
         <div class="panel-title"><span class="num">02</span> Choose Your Style</div>
-
         <div class="style-cards" id="style-cards">
           <div class="style-card selected" data-style="clean" onclick="selectStyle(this)">
             <div class="style-card-name">Clean Outlines</div>
@@ -212,7 +250,7 @@
           </div>
           <div class="style-card" data-style="intricate" onclick="selectStyle(this)">
             <div class="style-card-name">Intricate Detail</div>
-            <div class="style-card-desc">Fine patterns &amp; zentangle elements for advanced colorists</div>
+            <div class="style-card-desc">Fine lines, maximum detail — for advanced colorists</div>
           </div>
         </div>
 
@@ -235,7 +273,7 @@
           </div>
           <div class="setting-row">
             <label class="setting-label">Print Size</label>
-            <select id="print-size" style="font-family:'DM Mono',monospace;font-size:0.72rem;padding:0.45rem 0.7rem;border:1px solid rgba(139,111,71,0.3);border-radius:3px;background:var(--paper);color:var(--ink);cursor:pointer;width:100%;">
+            <select id="print-size">
               <option value="full">Full page — 8.5 × 11"</option>
               <option value="half-landscape">Half page landscape — 11 × 4.25"</option>
               <option value="half-portrait">Half page portrait — 5.5 × 8.5"</option>
@@ -248,6 +286,7 @@
             <div class="output-badges">
               <span class="output-badge">✓ PNG image</span>
               <span class="output-badge">✓ Print to PDF</span>
+              <span class="output-badge ai-badge" id="ai-mode-badge" style="display:none">✨ AI Tips</span>
             </div>
           </div>
           <div class="setting-row">
@@ -256,8 +295,7 @@
               Add decorative border &amp; title area
             </label>
             <div id="page-title-wrap" style="margin-top:0.6rem;">
-              <input type="text" id="page-title" placeholder="My Coloring Page"
-                style="width:100%;font-family:'Crimson Pro',serif;font-size:0.95rem;padding:0.45rem 0.7rem;border:1px solid rgba(139,111,71,0.3);border-radius:3px;background:var(--paper);color:var(--ink);" />
+              <input type="text" id="page-title" placeholder="My Coloring Page" />
               <div style="font-family:'DM Mono',monospace;font-size:0.62rem;color:rgba(139,111,71,0.5);margin-top:0.3rem;letter-spacing:0.05em;">Title printed at top of coloring page</div>
             </div>
           </div>
@@ -283,7 +321,6 @@
           <div class="drop-text">Drop multiple photos, or click to select</div>
           <div class="drop-sub">Select many at once · JPG · PNG · WEBP</div>
         </div>
-
         <div style="margin-top:1.5rem">
           <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:0.75rem">
             <div class="setting-label">Queue — <span id="queue-count">0 images</span></div>
@@ -307,7 +344,7 @@
             <div class="output-badges">
               <span class="output-badge">✓ PNG image</span>
               <span class="output-badge">✓ PDF 8.5 × 11"</span>
-              <span class="output-badge">✓ Combined PDF</span>
+              <span class="output-badge ai-badge" id="batch-ai-badge" style="display:none">✨ AI Tips</span>
             </div>
           </div>
           <div class="setting-row">
@@ -316,8 +353,7 @@
               Add decorative border &amp; title area to all pages
             </label>
             <div id="batch-page-title-wrap" style="margin-top:0.6rem;">
-              <input type="text" id="batch-page-title" placeholder="My Coloring Page"
-                style="width:100%;font-family:'Crimson Pro',serif;font-size:0.95rem;padding:0.45rem 0.7rem;border:1px solid rgba(139,111,71,0.3);border-radius:3px;background:var(--paper);color:var(--ink);" />
+              <input type="text" id="batch-page-title" placeholder="My Coloring Page" />
               <div style="font-family:'DM Mono',monospace;font-size:0.62rem;color:rgba(139,111,71,0.5);margin-top:0.3rem;letter-spacing:0.05em;">Applied to all pages in batch</div>
             </div>
           </div>
@@ -340,9 +376,90 @@
         <div class="progress-text hidden" id="batch-progress-text"></div>
       </div>
     </div>
+
+    <!-- ── SETTINGS MODE ── -->
+    <div id="settings-mode" class="hidden">
+      <div class="panel">
+        <div class="panel-title"><span class="num">⚙</span> AI Enhancement — Gemini</div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">
+            Status
+            <span class="ai-status-pill inactive" id="ai-status-pill">● Disabled</span>
+          </div>
+          <p style="font-size:0.9rem;color:var(--sepia);line-height:1.6;margin-bottom:0.75rem;">
+            When enabled, Gemini analyzes each image and adds tailored coloring tips after conversion.
+            Your API key is stored in your browser only — it is never sent to this app's server.
+          </p>
+          <p style="font-family:'DM Mono',monospace;font-size:0.68rem;color:rgba(139,111,71,0.6);line-height:1.6;">
+            Get a free key at <strong style="color:var(--sepia)">aistudio.google.com/apikey</strong> · Free tier: 1,500 requests/day
+          </p>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">API Key</div>
+          <div class="key-input-wrap" style="margin-bottom:0.75rem;">
+            <input type="password" id="gemini-key-input" placeholder="AIza…" autocomplete="off"
+              oninput="onKeyInput()" />
+            <button class="key-toggle" onclick="toggleKeyVisibility()" title="Show/hide key">👁</button>
+          </div>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <button class="btn btn-primary btn-sm" onclick="saveKey()">Save Key</button>
+            <button class="btn btn-secondary btn-sm" onclick="testKey()">Test Connection</button>
+            <button class="btn btn-danger btn-sm" onclick="clearKey()">Remove Key</button>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Usage &amp; Quota</div>
+          <div class="quota-display" id="quota-display">
+            <div style="color:rgba(139,111,71,0.5);font-style:italic">No API key configured — enter a key above to see quota information.</div>
+          </div>
+        </div>
+
+        <div class="settings-section" style="margin-bottom:0">
+          <div class="settings-section-title">Processing Mode</div>
+          <div class="settings-grid">
+            <div class="setting-row">
+              <label class="setting-label">Browser Processing</label>
+              <p style="font-size:0.85rem;color:var(--sepia);line-height:1.5;">
+                Pure in-browser Potrace algorithm — smooth Bezier curve line art, no internet connection required.
+                Available on all deployments at no cost.
+              </p>
+            </div>
+            <div class="setting-row" id="ai-mode-setting">
+              <label class="setting-label">AI Enhancement (Gemini)</label>
+              <label class="check-item">
+                <input type="checkbox" id="ai-tips-enabled" onchange="onAiToggle()" />
+                Enable AI coloring tips after each conversion
+              </label>
+              <p style="font-size:0.82rem;color:var(--sepia);font-style:italic;line-height:1.5;margin-top:0.4rem;">
+                Requires a valid Gemini API key above. Uses ~1 request per image converted.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:1.5rem">
+        <div class="panel-title"><span class="num">⚙</span> App Configuration</div>
+        <div class="settings-section">
+          <div class="settings-section-title">App Name Override</div>
+          <input type="text" id="app-name-override" placeholder="e.g. My Coloring Studio"
+            style="margin-bottom:0.5rem" />
+          <div style="font-family:'DM Mono',monospace;font-size:0.62rem;color:rgba(139,111,71,0.5);margin-bottom:0.75rem;letter-spacing:0.05em;">
+            Overrides the server-configured app name in your browser only
+          </div>
+          <div style="display:flex;gap:0.5rem">
+            <button class="btn btn-primary btn-sm" onclick="saveAppNameOverride()">Apply</button>
+            <button class="btn btn-secondary btn-sm" onclick="clearAppNameOverride()">Reset to Default</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- RIGHT COLUMN: Preview -->
+  <!-- ═══ RIGHT COLUMN: Preview ═══ -->
   <div>
     <div class="panel" style="min-height:500px">
       <div class="panel-title"><span class="num">03</span> Preview &amp; Download</div>
@@ -377,6 +494,13 @@
           <a class="btn btn-primary" id="batch-zip-link" href="#" download>⬇ Download All as ZIP</a>
         </div>
       </div>
+
+      <div id="settings-preview" class="hidden">
+        <div style="padding:2rem;text-align:center;color:rgba(139,111,71,0.4);">
+          <div style="font-size:3rem;margin-bottom:0.75rem">⚙️</div>
+          <p style="font-style:italic;font-size:0.9rem">Configure AI settings on the left, then switch to Single or Batch mode to convert images.</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -386,7 +510,7 @@
 <div id="style-modal" class="modal-backdrop hidden">
   <div class="modal-box">
     <div class="modal-title">Set Style for All Images</div>
-    <select id="modal-style" class="modal-select">
+    <select id="modal-style" style="margin-bottom:1rem;font-family:'DM Mono',monospace;font-size:0.72rem;padding:0.55rem 0.8rem;border:1px solid rgba(139,111,71,0.3);border-radius:3px;background:var(--paper);color:var(--ink);width:100%;cursor:pointer;">
       <option value="clean">Clean Outlines</option>
       <option value="detailed">Detailed Line Art</option>
       <option value="bold">Bold &amp; Simple</option>
@@ -402,6 +526,11 @@
 <div id="toast"></div>
 
 <script>
+'use strict';
+// ═══════════════════════════════════════════════════════════════════════════════
+// COLORCRAFT STUDIO — Main application script
+// ═══════════════════════════════════════════════════════════════════════════════
+
 const STYLES = [
   { value: 'clean',     label: 'Clean Outlines' },
   { value: 'detailed',  label: 'Detailed Line Art' },
@@ -409,20 +538,25 @@ const STYLES = [
   { value: 'intricate', label: 'Intricate Detail' },
 ];
 
-let currentMode = 'single';
-let selectedFile = null;
+let currentMode   = 'single';
+let selectedFile  = null;
 let selectedStyle = 'clean';
-let batchQueue = [];
+let batchQueue    = [];
 let batchIdCounter = 0;
-let isComparing = false;
+let isComparing   = false;
 
-// ── App name — configurable via server (Docker: APP_NAME env, CF: APP_NAME secret)
+// ── Session state (runtime only, not persisted) ─────────────────────────────
+let sessionRequestCount = 0; // Gemini requests this session
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// APP NAME
+// ═══════════════════════════════════════════════════════════════════════════════
 function applyAppName(name) {
   if (!name || name === '{{APP_NAME}}') name = 'ColorCraft Studio';
   document.title = name;
   const wordmark = document.getElementById('app-wordmark');
   if (!wordmark) return;
-  const parts = name.split(' ');
+  const parts = name.trim().split(' ');
   if (parts.length >= 2) {
     const last = parts.pop();
     wordmark.innerHTML = `${parts.join(' ')} <span>${last}</span>`;
@@ -431,48 +565,203 @@ function applyAppName(name) {
   }
 }
 
-// Apply immediately from meta tag (set by Docker/Express server-side injection)
-(function() {
+(function initAppName() {
+  // 1. localStorage override (user set via Settings tab)
+  const override = localStorage.getItem('cc_app_name_override');
+  if (override) { applyAppName(override); return; }
+  // 2. Server-injected meta tag (Docker/Express)
   const meta = document.querySelector('meta[name="app-name"]');
   applyAppName(meta ? meta.getAttribute('content') : null);
 })();
 
-// Also fetch from API on load — picks up APP_NAME on Cloudflare Pages
+// 3. Cloudflare: fetch from API (async, overrides if present)
 fetch('/api/convert').then(r => r.json()).then(data => {
-  if (data.appName) applyAppName(data.appName);
+  const override = localStorage.getItem('cc_app_name_override');
+  if (data.appName && !override) applyAppName(data.appName);
 }).catch(() => {});
 
-// ── Toggle page title input visibility ────────────────────────────────────────
-function togglePageTitleInput() {
-  const wrap = document.getElementById('page-title-wrap');
-  const checked = document.getElementById('border').checked;
-  if (wrap) wrap.style.display = checked ? '' : 'none';
+function saveAppNameOverride() {
+  const val = document.getElementById('app-name-override').value.trim();
+  if (!val) return toast('Enter an app name first', 'error');
+  localStorage.setItem('cc_app_name_override', val);
+  applyAppName(val);
+  toast('App name updated', 'success');
+}
+function clearAppNameOverride() {
+  localStorage.removeItem('cc_app_name_override');
+  document.getElementById('app-name-override').value = '';
+  // Re-apply from server
+  const meta = document.querySelector('meta[name="app-name"]');
+  applyAppName(meta ? meta.getAttribute('content') : null);
+  fetch('/api/convert').then(r=>r.json()).then(d => { if(d.appName) applyAppName(d.appName); }).catch(()=>{});
+  toast('App name reset to default', 'success');
 }
 
-function toggleBatchPageTitleInput() {
-  const wrap = document.getElementById('batch-page-title-wrap');
-  const checked = document.getElementById('batch-border').checked;
-  if (wrap) wrap.style.display = checked ? '' : 'none';
+// ═══════════════════════════════════════════════════════════════════════════════
+// SETTINGS — Gemini API key management
+// ═══════════════════════════════════════════════════════════════════════════════
+function getStoredKey()   { return localStorage.getItem('cc_gemini_key') || ''; }
+function getTipsEnabled() { return localStorage.getItem('cc_ai_tips') === '1' && !!getStoredKey(); }
+
+function initSettings() {
+  const key = getStoredKey();
+  if (key) {
+    document.getElementById('gemini-key-input').value = key;
+    document.getElementById('ai-tips-enabled').checked = getTipsEnabled();
+    updateAiStatusUI(true);
+    refreshQuotaDisplay();
+  } else {
+    updateAiStatusUI(false);
+  }
+  // Populate app name override field if set
+  const override = localStorage.getItem('cc_app_name_override');
+  if (override) document.getElementById('app-name-override').value = override;
 }
 
-// ── Mode ──────────────────────────────────────────
-function setMode(mode) {
-  currentMode = mode;
-  ['single','batch'].forEach(m => {
-    document.getElementById(`btn-${m}`).classList.toggle('active', m === mode);
-    document.getElementById(`${m}-mode`).classList.toggle('hidden', m !== mode);
-    document.getElementById(`${m}-preview`).classList.toggle('hidden', m !== mode);
+function onKeyInput() {
+  // Don't save on every keystroke — wait for Save button
+}
+
+function saveKey() {
+  const key = document.getElementById('gemini-key-input').value.trim();
+  if (!key) return toast('Paste your API key first', 'error');
+  if (!key.startsWith('AIza')) return toast('Gemini keys start with "AIza"', 'error');
+  localStorage.setItem('cc_gemini_key', key);
+  updateAiStatusUI(true);
+  refreshQuotaDisplay();
+  toast('API key saved', 'success');
+}
+
+function clearKey() {
+  localStorage.removeItem('cc_gemini_key');
+  localStorage.removeItem('cc_ai_tips');
+  document.getElementById('gemini-key-input').value = '';
+  document.getElementById('ai-tips-enabled').checked = false;
+  updateAiStatusUI(false);
+  updateAiBadges();
+  document.getElementById('quota-display').innerHTML =
+    '<div style="color:rgba(139,111,71,0.5);font-style:italic">No API key configured.</div>';
+  toast('API key removed', 'success');
+}
+
+async function testKey() {
+  const key = document.getElementById('gemini-key-input').value.trim();
+  if (!key) return toast('Enter a key first', 'error');
+  const btn = event.target;
+  btn.disabled = true; btn.textContent = 'Testing…';
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`
+    );
+    if (res.ok) {
+      toast('✓ Key is valid — connection successful', 'success');
+      // Auto-save if valid
+      localStorage.setItem('cc_gemini_key', key);
+      updateAiStatusUI(true);
+      refreshQuotaDisplay();
+    } else {
+      const err = await res.json().catch(() => ({}));
+      toast(err?.error?.message || 'Key invalid or quota exceeded', 'error');
+    }
+  } catch(e) {
+    toast('Network error — check your connection', 'error');
+  }
+  btn.disabled = false; btn.textContent = 'Test Connection';
+}
+
+function toggleKeyVisibility() {
+  const inp = document.getElementById('gemini-key-input');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function onAiToggle() {
+  const enabled = document.getElementById('ai-tips-enabled').checked;
+  if (enabled && !getStoredKey()) {
+    document.getElementById('ai-tips-enabled').checked = false;
+    toast('Save an API key first', 'error');
+    return;
+  }
+  localStorage.setItem('cc_ai_tips', enabled ? '1' : '0');
+  updateAiBadges();
+  toast(enabled ? 'AI tips enabled' : 'AI tips disabled', 'success');
+}
+
+function updateAiStatusUI(hasKey) {
+  const pill = document.getElementById('ai-status-pill');
+  pill.className = `ai-status-pill ${hasKey ? 'active' : 'inactive'}`;
+  pill.textContent = hasKey ? '● Active' : '● Disabled';
+  document.getElementById('ai-tips-enabled').disabled = !hasKey;
+  if (!hasKey) document.getElementById('ai-tips-enabled').checked = false;
+  updateAiBadges();
+}
+
+function updateAiBadges() {
+  const show = getTipsEnabled();
+  ['ai-mode-badge','batch-ai-badge'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = show ? '' : 'none';
   });
 }
 
-// ── Style selector (single) ───────────────────────
+// ── Quota display ─────────────────────────────────────────────────────────────
+async function refreshQuotaDisplay() {
+  const key = getStoredKey();
+  const el  = document.getElementById('quota-display');
+  if (!key) {
+    el.innerHTML = '<div style="color:rgba(139,111,71,0.5);font-style:italic">No API key configured.</div>';
+    return;
+  }
+
+  // Gemini free tier is 1,500 requests/day on Flash models.
+  // The API doesn't expose a quota endpoint, so we show session usage
+  // plus the known free tier limit.
+  const resetTime = new Date();
+  resetTime.setUTCHours(24, 0, 0, 0); // midnight UTC
+  const hoursLeft = Math.round((resetTime - Date.now()) / 3600000);
+
+  el.innerHTML = `
+    <div class="quota-row"><span>Model</span><strong>gemini-2.0-flash</strong></div>
+    <div class="quota-row"><span>Free tier limit</span><strong>1,500 req / day</strong></div>
+    <div class="quota-row"><span>This session</span><strong>${sessionRequestCount} request${sessionRequestCount !== 1 ? 's' : ''}</strong></div>
+    <div class="quota-row"><span>Quota resets in</span><strong>~${hoursLeft}h (midnight UTC)</strong></div>
+    <div style="margin-top:0.5rem;font-size:0.68rem;opacity:0.7">Each image conversion uses 1 request when AI tips are enabled.</div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MODE SWITCHING
+// ═══════════════════════════════════════════════════════════════════════════════
+function setMode(mode) {
+  currentMode = mode;
+  ['single','batch','settings'].forEach(m => {
+    document.getElementById(`btn-${m}`).classList.toggle('active', m === mode);
+    document.getElementById(`${m}-mode`).classList.toggle('hidden', m !== mode);
+    // right column previews
+    const pv = document.getElementById(`${m}-preview`);
+    if (pv) pv.classList.toggle('hidden', m !== mode);
+  });
+  if (mode === 'settings') initSettings();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════════════════════════════════
 function selectStyle(card) {
   document.querySelectorAll('#style-cards .style-card').forEach(c => c.classList.remove('selected'));
   card.classList.add('selected');
   selectedStyle = card.dataset.style;
 }
 
-// ── Drag & drop ───────────────────────────────────
+function togglePageTitleInput() {
+  const wrap = document.getElementById('page-title-wrap');
+  if (wrap) wrap.style.display = document.getElementById('border').checked ? '' : 'none';
+}
+function toggleBatchPageTitleInput() {
+  const wrap = document.getElementById('batch-page-title-wrap');
+  if (wrap) wrap.style.display = document.getElementById('batch-border').checked ? '' : 'none';
+}
+
+// ── Drag & Drop ───────────────────────────────────────────────────────────────
 function onDrag(e, entering, id) {
   e.preventDefault();
   document.getElementById(id).classList.toggle('dragover', entering);
@@ -489,11 +778,9 @@ function onBatchDrop(e) {
   document.getElementById('batch-drop').classList.remove('dragover');
   [...e.dataTransfer.files].filter(f => f.type.startsWith('image/')).forEach(addToQueue);
 }
-function onFileSelect(e) { if (e.target.files[0]) setFile(e.target.files[0]); }
-function onBatchFileSelect(e) {
-  [...e.target.files].forEach(addToQueue);
-  e.target.value = '';
-}
+function onFileSelect(e)      { if (e.target.files[0]) setFile(e.target.files[0]); }
+function onBatchFileSelect(e) { [...e.target.files].forEach(addToQueue); e.target.value = ''; }
+
 function setFile(file) {
   selectedFile = file;
   const url = URL.createObjectURL(file);
@@ -504,7 +791,9 @@ function setFile(file) {
   toast(`Loaded: ${file.name}`, 'success');
 }
 
-// ── Single convert ────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// SINGLE CONVERT
+// ═══════════════════════════════════════════════════════════════════════════════
 async function convertSingle() {
   if (!selectedFile) return toast('Please select an image first', 'error');
   const btn = document.getElementById('convert-btn');
@@ -515,360 +804,143 @@ async function convertSingle() {
     const lineWeight = parseFloat(document.getElementById('line-weight').value);
     const detail     = parseInt(document.getElementById('detail').value);
     const addBorder  = document.getElementById('border').checked;
+    const pageTitle  = addBorder
+      ? (document.getElementById('page-title').value.trim() || 'My Coloring Page') : '';
+    const printSize  = document.getElementById('print-size').value;
 
-    // ── Phase 1: Render coloring page immediately from local file ──
-    // No network call needed — canvas processes the image right in the browser.
     const localDataUrl = URL.createObjectURL(selectedFile);
-    const pageTitle = addBorder ? (document.getElementById('page-title').value.trim() || 'My Coloring Page') : '';
-    const printSize = document.getElementById('print-size').value;
     const coloringPageDataUrl = await renderColoringPage(
       localDataUrl, selectedStyle, lineWeight, detail, addBorder, pageTitle, printSize
     );
     URL.revokeObjectURL(localDataUrl);
 
-    // Show result right away — user can already download at this point
     const previewUrl = URL.createObjectURL(selectedFile);
-    showSingleResult(previewUrl, coloringPageDataUrl, null, selectedFile.name);
+    showSingleResult(previewUrl, coloringPageDataUrl, selectedFile.name);
     toast('Coloring page ready!', 'success');
+
     btn.disabled = false;
     btn.textContent = 'Convert to Coloring Page';
 
-    // ── Phase 2: Fetch Gemini tips in background (optional bonus) ──
-    showTipsLoading();
-    try {
-      const fd = new FormData();
-      fd.append('image', selectedFile);
-      fd.append('style', selectedStyle);
-      const res = await fetch('/api/convert', { method: 'POST', body: fd });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.coloringTips) showTips(data.coloringTips);
+    // AI tips — only if enabled
+    if (getTipsEnabled()) {
+      showTipsLoading();
+      try {
+        const tips = await fetchGeminiTips(selectedFile, selectedStyle);
+        if (tips) { showTips(tips); sessionRequestCount++; refreshQuotaDisplay(); }
         else hideTips();
-      } else { hideTips(); }
-    } catch { hideTips(); }
+      } catch { hideTips(); }
+    } else {
+      hideTips();
+    }
 
   } catch (err) {
     toast(err.message, 'error');
     console.error(err);
     btn.disabled = false;
     btn.textContent = 'Convert to Coloring Page';
-    hideTips();
   }
-}
-
-// ── Canvas-based coloring page renderer ──────────────────────────────────────
-async function renderColoringPage(imageDataUrl, style, lineWeight, detail, addBorder, pageTitle, printSize) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      try {
-        // Work at high resolution for print quality
-        const scale = Math.min(3, 2400 / Math.max(img.width, img.height));
-        const w = Math.round(img.width * scale);
-        const h = Math.round(img.height * scale);
-
-        // ── Step 1: Draw image to canvas ──
-        const srcCanvas = document.createElement('canvas');
-        srcCanvas.width = w; srcCanvas.height = h;
-        const srcCtx = srcCanvas.getContext('2d');
-        srcCtx.drawImage(img, 0, 0, w, h);
-        const srcData = srcCtx.getImageData(0, 0, w, h);
-
-        // ── Step 2: Convert to grayscale ──
-        const grayData = toGrayscale(srcData);
-
-        // ── Step 3: Apply Gaussian blur to reduce noise ──
-        const blurRadius = style === 'intricate' ? 1 : style === 'bold' ? 3 : 2;
-        const blurred = gaussianBlur(grayData, w, h, blurRadius);
-
-        // ── Step 4: Sobel edge detection ──
-        const edgeThreshold = getEdgeThreshold(style, detail);
-        const edges = sobelEdges(blurred, w, h, edgeThreshold);
-
-        // ── Step 5: Render as black lines on white ──
-        const outCanvas = document.createElement('canvas');
-        const margin = addBorder ? 80 : 0;
-        const titleArea = addBorder ? 60 : 0;
-
-        // Scale canvas to match chosen print size at 150dpi
-        const pagePx = getPrintSizePixels(printSize || 'full');
-        const imgAspect = (w + margin * 2) / (h + margin * 2 + titleArea);
-        const pageAspect = pagePx.w / pagePx.h;
-
-        // Fit the image into the page, letterboxing if necessary
-        let drawW, drawH;
-        if (imgAspect > pageAspect) {
-          drawW = pagePx.w;
-          drawH = Math.round(pagePx.w / imgAspect);
-        } else {
-          drawH = pagePx.h;
-          drawW = Math.round(pagePx.h * imgAspect);
-        }
-
-        outCanvas.width  = pagePx.w;
-        outCanvas.height = pagePx.h;
-        const outCtx = outCanvas.getContext('2d');
-
-        // White background
-        outCtx.fillStyle = 'white';
-        outCtx.fillRect(0, 0, outCanvas.width, outCanvas.height);
-
-        // Center the image on the page
-        const offsetX = Math.round((pagePx.w - drawW) / 2);
-        const offsetY = Math.round((pagePx.h - drawH) / 2);
-
-        // Draw border & title area if requested
-        const scaledMargin = Math.round(margin * drawW / (w + margin * 2));
-        const scaledTitleArea = Math.round(titleArea * drawH / (h + margin * 2 + titleArea));
-        if (addBorder) {
-          drawPageBorder(outCtx, drawW, drawH, scaledMargin, pageTitle || 'My Coloring Page', offsetX, offsetY);
-        }
-
-        // Draw edge pixels scaled to fit
-        const lw = getLineWidth(style, lineWeight);
-        drawEdgesScaled(outCtx, edges, w, h, scaledMargin, addBorder ? scaledTitleArea : 0, lw, drawW, drawH, offsetX, offsetY);
-
-        resolve(outCanvas.toDataURL('image/png'));
-      } catch (e) { reject(e); }
-    };
-    img.onerror = () => reject(new Error('Could not load image for processing'));
-    img.src = imageDataUrl;
-  });
-}
-
-function toGrayscale(imageData) {
-  const data = new Uint8Array(imageData.data.length / 4);
-  for (let i = 0; i < data.length; i++) {
-    const r = imageData.data[i*4];
-    const g = imageData.data[i*4+1];
-    const b = imageData.data[i*4+2];
-    data[i] = Math.round(0.299*r + 0.587*g + 0.114*b);
-  }
-  return data;
-}
-
-function gaussianBlur(data, w, h, radius) {
-  // Simple box blur approximation (fast)
-  const out = new Uint8Array(data.length);
-  const r = Math.max(1, radius);
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      let sum = 0, count = 0;
-      for (let dy = -r; dy <= r; dy++) {
-        for (let dx = -r; dx <= r; dx++) {
-          const nx = x+dx, ny = y+dy;
-          if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
-            sum += data[ny*w+nx];
-            count++;
-          }
-        }
-      }
-      out[y*w+x] = Math.round(sum/count);
-    }
-  }
-  return out;
-}
-
-function sobelEdges(gray, w, h, threshold) {
-  const edges = new Uint8Array(w * h);
-  for (let y = 1; y < h-1; y++) {
-    for (let x = 1; x < w-1; x++) {
-      const tl = gray[(y-1)*w+(x-1)], tm = gray[(y-1)*w+x], tr = gray[(y-1)*w+(x+1)];
-      const ml = gray[y*w+(x-1)],                             mr = gray[y*w+(x+1)];
-      const bl = gray[(y+1)*w+(x-1)], bm = gray[(y+1)*w+x], br = gray[(y+1)*w+(x+1)];
-      const gx = -tl - 2*ml - bl + tr + 2*mr + br;
-      const gy = -tl - 2*tm - tr + bl + 2*bm + br;
-      const mag = Math.sqrt(gx*gx + gy*gy);
-      edges[y*w+x] = mag > threshold ? 255 : 0;
-    }
-  }
-  return edges;
-}
-
-function getEdgeThreshold(style, detail) {
-  // Lower threshold = more edges (more detail)
-  const base = { clean: 60, detailed: 35, bold: 90, intricate: 20 };
-  const b = base[style] || 60;
-  // detail slider 1-10: higher detail = lower threshold
-  return Math.max(10, b - (detail - 5) * 6);
-}
-
-function getLineWidth(style, lineWeightSlider) {
-  const base = { clean: 1.2, detailed: 0.8, bold: 2.0, intricate: 0.6 };
-  return (base[style] || 1.2) * lineWeightSlider * 0.6;
-}
-
-// ── Print size → pixel dimensions at 150dpi ──────────────────────────────────
-function getPrintSizePixels(size) {
-  const DPI = 150;
-  const sizes = {
-    'full':           { w: Math.round(8.5 * DPI),  h: Math.round(11   * DPI) },
-    'half-landscape': { w: Math.round(11  * DPI),  h: Math.round(4.25 * DPI) },
-    'half-portrait':  { w: Math.round(5.5 * DPI),  h: Math.round(8.5  * DPI) },
-    'quarter':        { w: Math.round(5.5 * DPI),  h: Math.round(4.25 * DPI) },
-    'a4':             { w: Math.round(8.27* DPI),  h: Math.round(11.69* DPI) },
-  };
-  return sizes[size] || sizes['full'];
-}
-
-// ── Draw edges scaled into the target draw area ───────────────────────────────
-function drawEdgesScaled(ctx, edges, srcW, srcH, marginX, marginTop, lineWidth, drawW, drawH, offsetX, offsetY) {
-  ctx.fillStyle = 'black';
-  const lw = Math.max(1, Math.round(lineWidth));
-  const imgDrawW = drawW - marginX * 2;
-  const imgDrawH = drawH - marginX * 2 - marginTop;
-  const scaleX = imgDrawW / srcW;
-  const scaleY = imgDrawH / srcH;
-  for (let y = 0; y < srcH; y++) {
-    for (let x = 0; x < srcW; x++) {
-      if (edges[y * srcW + x] > 0) {
-        const px = offsetX + marginX + Math.round(x * scaleX);
-        const py = offsetY + marginTop + marginX + Math.round(y * scaleY);
-        ctx.fillRect(px, py, lw, lw);
-      }
-    }
-  }
-}
-
-// ── Draw decorative border with custom title ───────────────────────────────────
-function drawPageBorder(ctx, totalW, totalH, margin, title, offsetX, offsetY) {
-  const ox = offsetX || 0;
-  const oy = offsetY || 0;
-  const t  = title || 'My Coloring Page';
-
-  // Outer decorative border
-  ctx.strokeStyle = '#222';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(ox + margin * 0.35, oy + margin * 0.35, totalW - margin * 0.7, totalH - margin * 0.7);
-
-  // Inner border
-  ctx.lineWidth = 1;
-  ctx.strokeRect(ox + margin * 0.5, oy + margin * 0.5, totalW - margin, totalH - margin);
-
-  // Title separator line
-  ctx.strokeStyle = '#aaa';
-  ctx.beginPath();
-  ctx.moveTo(ox + margin * 0.7, oy + margin * 1.8);
-  ctx.lineTo(ox + totalW - margin * 0.7, oy + margin * 1.8);
-  ctx.stroke();
-
-  // Title text
-  ctx.font = `${Math.round(margin * 0.55)}px Georgia, serif`;
-  ctx.fillStyle = '#888';
-  ctx.textAlign = 'center';
-  ctx.fillText(t, ox + totalW / 2, oy + margin * 1.45);
-}
-
-// ── Show result ───────────────────────────────────
-function showSingleResult(originalUrl, coloringPageDataUrl, tips, filename) {
-  // Show coloring page in preview
-  document.getElementById('preview-area').innerHTML =
-    `<img src="${coloringPageDataUrl}" alt="coloring page" style="max-height:320px;object-fit:contain;" />`;
-
-  // Before/After compare
-  const sec = document.getElementById('compare-section');
-  sec.classList.remove('hidden');
-  document.getElementById('compare-before').src = originalUrl;
-  document.getElementById('compare-after').src = coloringPageDataUrl;
-  document.getElementById('compare-overlay').style.width = '50%';
-  document.getElementById('compare-handle').style.left = '50%';
-
-  const shelf = document.getElementById('download-shelf');
-  shelf.classList.remove('hidden');
-  shelf.innerHTML = '';
-
-  // Download PNG
-  const pngLink = document.createElement('a');
-  pngLink.className = 'download-card';
-  pngLink.href = coloringPageDataUrl;
-  pngLink.download = filename.replace(/\.[^.]+$/, '') + '-coloring-page.png';
-  pngLink.innerHTML = '📥 Download PNG';
-  shelf.appendChild(pngLink);
-
-  // Print/PDF button
-  const pdfBtn = document.createElement('button');
-  pdfBtn.className = 'download-card';
-  pdfBtn.style.cursor = 'pointer';
-  pdfBtn.innerHTML = '📄 Print / Save as PDF';
-  pdfBtn.onclick = () => printAsPdf(coloringPageDataUrl, filename);
-  shelf.appendChild(pdfBtn);
-
-  // Tips placeholder — filled in async by showTips() / showTipsLoading() / hideTips()
-  const tipEl = document.createElement('div');
-  tipEl.id = 'tips-area';
-  tipEl.style.cssText = 'width:100%;margin-top:0.75rem;';
-  shelf.appendChild(tipEl);
-
-  // If tips were passed directly (e.g. from batch), show them now
-  if (tips) showTips(tips);
-}
-
-// ── Tips helpers ──────────────────────────────────
-function showTipsLoading() {
-  const el = document.getElementById('tips-area');
-  if (!el) return;
-  el.innerHTML = `<div style="padding:0.6rem 1rem;background:rgba(212,168,67,0.05);border:1px solid rgba(212,168,67,0.2);border-radius:3px;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:rgba(139,111,71,0.5);">
-    <span class="spinner" style="border-color:rgba(139,111,71,0.2);border-top-color:var(--sepia);"></span> Fetching AI coloring tips…
-  </div>`;
-}
-
-function showTips(text) {
-  const el = document.getElementById('tips-area');
-  if (!el) return;
-  el.innerHTML = `<div style="padding:0.75rem 1rem;background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.3);border-radius:3px;font-size:0.88rem;color:#6b5000;font-style:italic;">
-    <strong style="font-style:normal;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:0.4rem;color:var(--sepia)">✨ AI Coloring Tips</strong>
-    ${text}
-  </div>`;
-}
-
-function hideTips() {
-  const el = document.getElementById('tips-area');
-  if (el) el.innerHTML = '';
-}
-
-// ── Print-to-PDF helper ───────────────────────────
-function printAsPdf(dataUrl, filename) {
-  const win = window.open('', '_blank');
-  win.document.write(`<!DOCTYPE html>
-<html><head><title>${filename} — Coloring Page</title>
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:white; }
-  img { width:100%; height:auto; display:block; }
-  @page { size: letter portrait; margin: 0; }
-  @media print { body { print-color-adjust: exact; } }
-</style>
-</head><body>
-<img src="${dataUrl}" />
-<script>window.onload=()=>{window.print();window.onafterprint=()=>window.close();}<\/script>
-</body></html>`);
-  win.document.close();
 }
 
 function resetSingle() {
   selectedFile = null;
   document.getElementById('file-input').value = '';
-  document.getElementById('preview-area').innerHTML = `<div class="preview-empty"><span class="big">✏️</span><p>Your coloring page will appear here</p></div>`;
+  document.getElementById('preview-area').innerHTML =
+    `<div class="preview-empty"><span class="big">✏️</span><p>Your coloring page will appear here</p></div>`;
   document.getElementById('compare-section').classList.add('hidden');
   document.getElementById('download-shelf').classList.add('hidden');
 }
 
-// ── Batch queue ───────────────────────────────────
-function styleOptionsHtml(selected = 'clean') {
-  return STYLES.map(s => `<option value="${s.value}"${s.value===selected?' selected':''}>${s.label}</option>`).join('');
+// ═══════════════════════════════════════════════════════════════════════════════
+// GEMINI TIPS — browser-direct API call with stored key
+// ═══════════════════════════════════════════════════════════════════════════════
+async function fetchGeminiTips(file, style) {
+  const key = getStoredKey();
+  if (!key) return null;
+
+  const model = 'gemini-2.0-flash';
+  const styleLabels = {
+    clean: 'Clean Outlines', detailed: 'Detailed Line Art',
+    bold: 'Bold & Simple', intricate: 'Intricate Detail'
+  };
+
+  // Convert file to base64
+  const b64 = await new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload  = e => res(e.target.result.split(',')[1]);
+    reader.onerror = rej;
+    reader.readAsDataURL(file);
+  });
+
+  const prompt = `This image has been converted to a ${styleLabels[style] || style} coloring book page.
+Give 3 brief, practical coloring tips for this specific image. Consider:
+- Which areas to color first
+- Color palette suggestions that suit the scene
+- Any special techniques for the style
+
+Keep tips concise (1-2 sentences each). Format as a simple numbered list.`;
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { inline_data: { mime_type: file.type || 'image/jpeg', data: b64 } },
+            { text: prompt }
+          ]
+        }],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 300 }
+      })
+    }
+  );
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `Gemini error ${res.status}`);
+  }
+
+  const data = await res.json();
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text || null;
 }
+
+// Also try server-side Gemini for backwards compat (Docker with server key)
+async function fetchTipsViaServer(file, style) {
+  const fd = new FormData();
+  fd.append('image', file);
+  fd.append('style', style);
+  const res = await fetch('/api/convert', { method: 'POST', body: fd });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data?.coloringTips || null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// BATCH PROCESSING
+// ═══════════════════════════════════════════════════════════════════════════════
+function styleOptionsHtml(selected = 'clean') {
+  return STYLES.map(s =>
+    `<option value="${s.value}"${s.value===selected?' selected':''}>${s.label}</option>`
+  ).join('');
+}
+
 function addToQueue(file) {
   const id = ++batchIdCounter;
   batchQueue.push({ id, file, url: URL.createObjectURL(file), style: 'clean', status: 'pending' });
   renderQueue();
 }
 function removeFromQueue(id) { batchQueue = batchQueue.filter(i => i.id !== id); renderQueue(); }
-function clearQueue() { batchQueue = []; renderQueue(); }
-function updateQueueItemStyle(id, style) { const i = batchQueue.find(i=>i.id===id); if(i) i.style=style; }
+function clearQueue()        { batchQueue = []; renderQueue(); }
+function updateQueueItemStyle(id, style) {
+  const i = batchQueue.find(i => i.id === id);
+  if (i) i.style = style;
+}
 
 function renderQueue() {
   const list = document.getElementById('queue-list');
-  document.getElementById('queue-count').textContent = `${batchQueue.length} image${batchQueue.length!==1?'s':''}`;
+  document.getElementById('queue-count').textContent =
+    `${batchQueue.length} image${batchQueue.length !== 1 ? 's' : ''}`;
   if (!batchQueue.length) {
     list.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(139,111,71,0.4);font-style:italic;font-size:0.9rem">Queue is empty — add images above</div>';
     return;
@@ -887,7 +959,6 @@ function renderQueue() {
     </div>`).join('');
 }
 
-// ── Set-all modal ─────────────────────────────────
 function openSetAllModal() {
   if (!batchQueue.length) return toast('Queue is empty', 'error');
   document.getElementById('style-modal').classList.remove('hidden');
@@ -896,12 +967,10 @@ function closeModal() { document.getElementById('style-modal').classList.add('hi
 function applyAllStyles() {
   const style = document.getElementById('modal-style').value;
   batchQueue.forEach(i => i.style = style);
-  renderQueue();
-  closeModal();
+  renderQueue(); closeModal();
   toast(`All images → ${STYLES.find(s=>s.value===style)?.label}`, 'success');
 }
 
-// ── Batch processing ──────────────────────────────
 async function runBatch() {
   if (!batchQueue.length) return toast('Queue is empty', 'error');
   const btn = document.getElementById('batch-btn');
@@ -915,7 +984,9 @@ async function runBatch() {
   pb.style.width = '0%';
 
   const concurrency = parseInt(document.getElementById('concurrency').value);
-  const addBorder = document.getElementById('batch-border').checked;
+  const addBorder   = document.getElementById('batch-border').checked;
+  const batchTitle  = addBorder
+    ? (document.getElementById('batch-page-title').value.trim() || 'My Coloring Page') : '';
   const total = batchQueue.length;
   let done = 0;
   const results = [];
@@ -928,53 +999,46 @@ async function runBatch() {
     await Promise.all(chunk.map(async item => {
       setQueueStatus(item.id, 'processing');
       try {
-        // Phase 1: render locally — fast, no network needed
         const localUrl = URL.createObjectURL(item.file);
-        const batchPageTitle = addBorder ? (document.getElementById('batch-page-title').value.trim() || 'My Coloring Page') : '';
         const coloringPageDataUrl = await renderColoringPage(
-          localUrl, item.style, 2, 6, addBorder, batchPageTitle, 'full'
+          localUrl, item.style, 2, 6, addBorder, batchTitle, 'full'
         );
         URL.revokeObjectURL(localUrl);
-        results.push({ item, coloringPageDataUrl, tips: null });
+        results.push({ item, coloringPageDataUrl });
         setQueueStatus(item.id, 'done');
-      } catch (e) {
+      } catch(e) {
         console.error(e);
         setQueueStatus(item.id, 'error');
       }
       done++;
-      pb.style.width = `${(done/total)*100}%`;
+      pb.style.width = `${(done / total) * 100}%`;
       pt.textContent = `${done} / ${total} images processed`;
     }));
   }
 
-  // Phase 2: fetch Gemini tips for all successful results in background
   renderBatchResults(results);
-  btn.disabled = false;
-  btn.textContent = 'Process All Images';
+  btn.disabled = false; btn.textContent = 'Process All Images';
   toast(`Done! ${results.length} of ${total} converted.`, 'success');
 
-  // Fire-and-forget tips fetch for each result
-  results.forEach(({ item }) => {
-    const fd = new FormData();
-    fd.append('image', item.file);
-    fd.append('style', item.style);
-    fetch('/api/convert', { method: 'POST', body: fd })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (data?.coloringTips) {
-          const el = document.getElementById(`batch-tips-${item.id}`);
-          if (el) el.textContent = data.coloringTips;
-        }
-      })
-      .catch(() => {});
-  });
-  return; // early return — toast/button already handled above
-  // (the lines below are now unreachable but kept for safety)
-
+  // AI tips in background — only if enabled
+  if (getTipsEnabled()) {
+    results.forEach(({ item }) => {
+      fetchGeminiTips(item.file, item.style)
+        .then(tips => {
+          if (tips) {
+            const el = document.getElementById(`batch-tips-${item.id}`);
+            if (el) el.innerHTML = `<strong style="font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--sepia);display:block;margin-bottom:0.25rem">✨ AI Tips</strong>${tips}`;
+            sessionRequestCount++;
+            refreshQuotaDisplay();
+          }
+        })
+        .catch(() => {});
+    });
+  }
 }
 
 function setQueueStatus(id, status) {
-  const item = batchQueue.find(i=>i.id===id);
+  const item = batchQueue.find(i => i.id === id);
   if (item) item.status = status;
   const el = document.querySelector(`#qi-${id} .queue-status`);
   if (el) { el.className = `queue-status status-${status}`; el.textContent = status; }
@@ -986,18 +1050,17 @@ function renderBatchResults(results) {
   results.forEach(({ item, coloringPageDataUrl }) => {
     const baseName = item.file.name.replace(/\.[^.]+$/, '');
     const div = document.createElement('div');
-    div.style.cssText = 'display:flex;gap:1rem;align-items:center;padding:0.75rem;background:var(--paper);border-radius:3px;border:1px solid rgba(139,111,71,0.15)';
+    div.style.cssText = 'display:flex;gap:1rem;align-items:flex-start;padding:0.75rem;background:var(--paper);border-radius:3px;border:1px solid rgba(139,111,71,0.15)';
     div.innerHTML = `
       <img src="${coloringPageDataUrl}" style="width:72px;height:72px;object-fit:cover;border-radius:3px;flex-shrink:0;" />
       <div style="flex:1;min-width:0">
         <div style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--sepia);margin-bottom:0.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.file.name}</div>
         <div style="font-family:'DM Mono',monospace;font-size:0.62rem;color:rgba(139,111,71,0.6);margin-bottom:0.5rem">${STYLES.find(s=>s.value===item.style)?.label}</div>
-        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.4rem" id="batch-dl-${item.id}"></div>
-        <div id="batch-tips-${item.id}" style="font-size:0.78rem;color:#6b5000;font-style:italic;line-height:1.4;"></div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem" id="batch-dl-${item.id}"></div>
+        <div id="batch-tips-${item.id}" style="font-size:0.78rem;color:#6b5000;line-height:1.5;"></div>
       </div>`;
     container.appendChild(div);
 
-    // PNG download
     const a = document.createElement('a');
     a.className = 'download-card';
     a.href = coloringPageDataUrl;
@@ -1006,7 +1069,6 @@ function renderBatchResults(results) {
     a.textContent = '📥 PNG';
     document.getElementById(`batch-dl-${item.id}`).appendChild(a);
 
-    // PDF print button
     const btn = document.createElement('button');
     btn.className = 'download-card';
     btn.style.cssText = 'font-size:0.65rem;padding:0.3rem 0.7rem;cursor:pointer';
@@ -1017,24 +1079,101 @@ function renderBatchResults(results) {
   document.getElementById('batch-preview').classList.remove('hidden');
 }
 
-// ── Compare slider ────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// SHOW RESULT / TIPS
+// ═══════════════════════════════════════════════════════════════════════════════
+function showSingleResult(originalUrl, coloringPageDataUrl, filename) {
+  document.getElementById('preview-area').innerHTML =
+    `<img src="${coloringPageDataUrl}" alt="coloring page" style="max-height:320px;object-fit:contain;" />`;
+
+  const sec = document.getElementById('compare-section');
+  sec.classList.remove('hidden');
+  document.getElementById('compare-before').src = originalUrl;
+  document.getElementById('compare-after').src  = coloringPageDataUrl;
+  document.getElementById('compare-overlay').style.width = '50%';
+  document.getElementById('compare-handle').style.left   = '50%';
+
+  const shelf = document.getElementById('download-shelf');
+  shelf.classList.remove('hidden');
+  shelf.innerHTML = '';
+
+  const pngLink = document.createElement('a');
+  pngLink.className = 'download-card';
+  pngLink.href = coloringPageDataUrl;
+  pngLink.download = filename.replace(/\.[^.]+$/, '') + '-coloring-page.png';
+  pngLink.innerHTML = '📥 Download PNG';
+  shelf.appendChild(pngLink);
+
+  const pdfBtn = document.createElement('button');
+  pdfBtn.className = 'download-card';
+  pdfBtn.style.cursor = 'pointer';
+  pdfBtn.innerHTML = '📄 Print / Save as PDF';
+  pdfBtn.onclick = () => printAsPdf(coloringPageDataUrl, filename);
+  shelf.appendChild(pdfBtn);
+
+  const tipEl = document.createElement('div');
+  tipEl.id = 'tips-area';
+  tipEl.style.cssText = 'width:100%;margin-top:0.75rem;';
+  shelf.appendChild(tipEl);
+}
+
+function showTipsLoading() {
+  const el = document.getElementById('tips-area');
+  if (!el) return;
+  el.innerHTML = `<div class="tips-loading"><span class="spinner" style="border-color:rgba(139,111,71,0.2);border-top-color:var(--sepia);"></span> Getting AI coloring tips…</div>`;
+}
+function showTips(text) {
+  const el = document.getElementById('tips-area');
+  if (!el) return;
+  el.innerHTML = `<div class="tips-card"><strong>✨ AI Coloring Tips</strong>${text}</div>`;
+}
+function hideTips() {
+  const el = document.getElementById('tips-area');
+  if (el) el.innerHTML = '';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PRINT TO PDF
+// ═══════════════════════════════════════════════════════════════════════════════
+function printAsPdf(dataUrl, filename) {
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html>
+<html><head><title>${filename} — Coloring Page</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:white; }
+  img { width:100%; height:auto; display:block; }
+  @page { size: letter portrait; margin: 0; }
+  @media print { body { print-color-adjust: exact; } }
+</style></head><body>
+<img src="${dataUrl}" />
+<script>window.onload=()=>{window.print();window.onafterprint=()=>window.close();}<\/script>
+</body></html>`);
+  win.document.close();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// COMPARE SLIDER
+// ═══════════════════════════════════════════════════════════════════════════════
 function startCompare(e) {
   isComparing = true;
   const move = ev => {
     if (!isComparing) return;
     const rect = document.getElementById('compare-wrap').getBoundingClientRect();
-    const t = ev.touches ? ev.touches[0] : ev;
+    const t   = ev.touches ? ev.touches[0] : ev;
     const pct = Math.max(0, Math.min(100, ((t.clientX - rect.left) / rect.width) * 100));
     document.getElementById('compare-overlay').style.width = pct + '%';
-    document.getElementById('compare-handle').style.left = pct + '%';
+    document.getElementById('compare-handle').style.left   = pct + '%';
   };
   document.addEventListener('mousemove', move);
-  document.addEventListener('mouseup', () => { isComparing = false; }, { once: true });
+  document.addEventListener('mouseup',   () => { isComparing = false; }, { once: true });
   document.addEventListener('touchmove', move, { passive: true });
-  document.addEventListener('touchend', () => { isComparing = false; }, { once: true });
+  document.addEventListener('touchend',  () => { isComparing = false; }, { once: true });
 }
 
-// ── Toast ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════════════════
 let toastTimer;
 function toast(msg, type = 'success') {
   const el = document.getElementById('toast');
@@ -1043,6 +1182,305 @@ function toast(msg, type = 'success') {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { el.className = ''; }, 3500);
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// IMAGE PROCESSING PIPELINE
+// Best-in-browser approach:
+//   1. Grayscale
+//   2. Heavy bilateral-approximation blur (edge-preserving noise kill)
+//   3. Posterize to N tonal bands (photo → flat regions)
+//   4. Light smoothing blur (clean up quantization steps)
+//   5. Sobel edge detection (fires only at region boundaries)
+//   6. Edge cleanup — thin, then dilate for solid lines
+//   7. Composite onto page canvas at print resolution
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function renderColoringPage(imageDataUrl, style, lineWeight, detail, addBorder, pageTitle, printSize) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        // Process at 1.5× — enough for crisp print, fast enough for the browser
+        const MAX = 1400;
+        const scale = Math.min(1.5, MAX / Math.max(img.width, img.height));
+        const w = Math.round(img.width  * scale);
+        const h = Math.round(img.height * scale);
+
+        const srcCanvas = document.createElement('canvas');
+        srcCanvas.width = w; srcCanvas.height = h;
+        const srcCtx = srcCanvas.getContext('2d');
+        srcCtx.drawImage(img, 0, 0, w, h);
+        const srcData = srcCtx.getImageData(0, 0, w, h);
+
+        const edges = coloringPipeline(srcData, w, h, style, detail);
+        const lw    = getLineWidth(style, lineWeight);
+
+        // ── Page layout ──────────────────────────────────────────────────────
+        const margin    = addBorder ? 80 : 0;
+        const titleArea = addBorder ? 60 : 0;
+        const pagePx    = getPrintSizePixels(printSize || 'full');
+
+        const imgAspect  = (w + margin * 2) / (h + margin * 2 + titleArea);
+        const pageAspect = pagePx.w / pagePx.h;
+        let drawW, drawH;
+        if (imgAspect > pageAspect) {
+          drawW = pagePx.w;
+          drawH = Math.round(pagePx.w / imgAspect);
+        } else {
+          drawH = pagePx.h;
+          drawW = Math.round(pagePx.h * imgAspect);
+        }
+
+        const outCanvas = document.createElement('canvas');
+        outCanvas.width  = pagePx.w;
+        outCanvas.height = pagePx.h;
+        const outCtx = outCanvas.getContext('2d');
+        outCtx.fillStyle = 'white';
+        outCtx.fillRect(0, 0, pagePx.w, pagePx.h);
+
+        const offsetX = Math.round((pagePx.w - drawW) / 2);
+        const offsetY = Math.round((pagePx.h - drawH) / 2);
+
+        const scaledMargin    = Math.round(margin    * drawW / (w + margin * 2));
+        const scaledTitleArea = Math.round(titleArea * drawH / (h + margin * 2 + titleArea));
+
+        if (addBorder) {
+          drawPageBorder(outCtx, drawW, drawH, scaledMargin,
+            pageTitle || 'My Coloring Page', offsetX, offsetY);
+        }
+
+        drawEdgesScaled(outCtx, edges, w, h,
+          scaledMargin, addBorder ? scaledTitleArea : 0,
+          lw, drawW, drawH, offsetX, offsetY);
+
+        resolve(outCanvas.toDataURL('image/png'));
+      } catch(e) { reject(e); }
+    };
+    img.onerror = () => reject(new Error('Could not load image'));
+    img.src = imageDataUrl;
+  });
+}
+
+// ── Grayscale ─────────────────────────────────────────────────────────────────
+function toGrayscale(imageData) {
+  const src = imageData.data;
+  const n   = src.length >>> 2;
+  const out = new Uint8Array(n);
+  for (let i = 0; i < n; i++) {
+    const j = i << 2;
+    out[i] = (77 * src[j] + 150 * src[j+1] + 29 * src[j+2]) >> 8;
+  }
+  return out;
+}
+
+// ── Fast separable box blur (single pass, sliding window) ─────────────────────
+function boxBlur(data, w, h, radius) {
+  if (radius < 1) return new Uint8Array(data);
+  const r   = radius | 0;
+  const den = r * 2 + 1;
+  const tmp = new Uint8Array(data.length);
+  const out = new Uint8Array(data.length);
+
+  // Horizontal
+  for (let y = 0; y < h; y++) {
+    const row = y * w;
+    let sum = data[row] * (r + 1);
+    for (let k = 1; k <= r; k++) sum += data[row + Math.min(k, w-1)];
+    for (let x = 0; x < w; x++) {
+      tmp[row+x] = (sum / den) | 0;
+      sum -= data[row + Math.max(0, x-r)];
+      sum += data[row + Math.min(w-1, x+r+1)];
+    }
+  }
+  // Vertical
+  for (let x = 0; x < w; x++) {
+    let sum = tmp[x] * (r + 1);
+    for (let k = 1; k <= r; k++) sum += tmp[Math.min(k,h-1)*w+x];
+    for (let y = 0; y < h; y++) {
+      out[y*w+x] = (sum / den) | 0;
+      sum -= tmp[Math.max(0,y-r)*w+x];
+      sum += tmp[Math.min(h-1,y+r+1)*w+x];
+    }
+  }
+  return out;
+}
+
+// ── Edge-preserving bilateral-approximation blur ──────────────────────────────
+// Two box blurs at different radii blended based on local contrast.
+// Smooth regions get heavy blur. High-contrast regions (edges) get light blur.
+// This is the key improvement over plain box blur — texture is killed inside
+// flat regions, but real edges remain sharp going into Sobel.
+function smartBlur(data, w, h, heavyR, lightR) {
+  const heavy = boxBlur(data, w, h, heavyR);
+  const light = boxBlur(data, w, h, lightR);
+  const out   = new Uint8Array(data.length);
+  const n     = data.length;
+  for (let i = 0; i < n; i++) {
+    // Local contrast at this pixel (difference from light blur = amount of detail)
+    const contrast = Math.abs(data[i] - light[i]);
+    // If high contrast → use light-blurred version (preserve edge)
+    // If low contrast  → use heavy-blurred version (kill texture)
+    const t = Math.min(1, contrast / 30); // 30 = sensitivity threshold
+    out[i] = Math.round(heavy[i] * (1 - t) + light[i] * t);
+  }
+  return out;
+}
+
+// ── Posterize ─────────────────────────────────────────────────────────────────
+function posterize(data, levels) {
+  const out  = new Uint8Array(data.length);
+  const step = 255 / (levels - 1);
+  for (let i = 0; i < data.length; i++) {
+    out[i] = Math.round(Math.round(data[i] / step) * step);
+  }
+  return out;
+}
+
+// ── Sobel edge detection ──────────────────────────────────────────────────────
+function sobelEdges(gray, w, h, threshold) {
+  const edges = new Uint8Array(w * h);
+  for (let y = 1; y < h-1; y++) {
+    for (let x = 1; x < w-1; x++) {
+      const tl=gray[(y-1)*w+(x-1)], tm=gray[(y-1)*w+x], tr=gray[(y-1)*w+(x+1)];
+      const ml=gray[y*w+(x-1)],                           mr=gray[y*w+(x+1)];
+      const bl=gray[(y+1)*w+(x-1)], bm=gray[(y+1)*w+x], br=gray[(y+1)*w+(x+1)];
+      const gx = -tl - 2*ml - bl + tr + 2*mr + br;
+      const gy = -tl - 2*tm - tr + bl + 2*bm + br;
+      edges[y*w+x] = Math.sqrt(gx*gx + gy*gy) > threshold ? 255 : 0;
+    }
+  }
+  return edges;
+}
+
+// ── Thin edges (non-maximum suppression along gradient direction) ──────────────
+function thinEdges(edges, w, h) {
+  const out = new Uint8Array(w * h);
+  for (let y = 1; y < h-1; y++) {
+    for (let x = 1; x < w-1; x++) {
+      if (!edges[y*w+x]) continue;
+      // Keep only if it's a local maximum in at least one direction
+      const h1 = edges[y*w+(x-1)], h2 = edges[y*w+(x+1)];
+      const v1 = edges[(y-1)*w+x], v2 = edges[(y+1)*w+x];
+      if (edges[y*w+x] >= h1 && edges[y*w+x] >= h2) { out[y*w+x] = 255; continue; }
+      if (edges[y*w+x] >= v1 && edges[y*w+x] >= v2) { out[y*w+x] = 255; }
+    }
+  }
+  return out;
+}
+
+// ── Dilate (thicken) edges by 1px — makes lines feel solid ───────────────────
+function dilateEdges(edges, w, h) {
+  const out = new Uint8Array(w * h);
+  for (let y = 1; y < h-1; y++) {
+    for (let x = 1; x < w-1; x++) {
+      const i = y*w+x;
+      if (edges[i] || edges[i-1] || edges[i+1] || edges[i-w] || edges[i+w]) out[i] = 255;
+    }
+  }
+  return out;
+}
+
+// ── Full pipeline ─────────────────────────────────────────────────────────────
+function coloringPipeline(imageData, w, h, style, detail) {
+  //                  heavyBlur  lightBlur  levels  threshold  dilate
+  const params = {
+    bold:      [  12,   3,   4,   22,   true  ],
+    clean:     [   8,   2,   6,   16,   true  ],
+    detailed:  [   5,   1,   8,   11,   true  ],
+    intricate: [   3,   1,  12,    7,   false ],
+  };
+  const [hR, lR, baseLevels, baseThresh, doDilate] = params[style] || params.clean;
+
+  // Detail slider (1-10) shifts levels and threshold
+  const d = (detail - 5) / 5; // -1 … +1
+  const levels    = Math.max(3, Math.round(baseLevels + d * 5));
+  const threshold = Math.max(4,          baseThresh  - d * 4);
+
+  let gray = toGrayscale(imageData);
+  gray     = smartBlur(gray, w, h, hR, lR);   // edge-preserving blur
+  gray     = posterize(gray, levels);           // flatten to tonal bands
+  gray     = boxBlur(gray, w, h, 1);           // tiny smooth to clean posterize steps
+  let edges = sobelEdges(gray, w, h, threshold);
+  edges     = thinEdges(edges, w, h);          // 1-pixel-wide ridges
+  if (doDilate) edges = dilateEdges(edges, w, h);
+  return edges;
+}
+
+// ── Style → line width ────────────────────────────────────────────────────────
+function getLineWidth(style, lineWeightSlider) {
+  const base = { clean: 1.5, detailed: 1.1, bold: 2.2, intricate: 0.9 };
+  return (base[style] || 1.5) * lineWeightSlider * 0.55;
+}
+
+// ── Print sizes at 150 DPI ────────────────────────────────────────────────────
+function getPrintSizePixels(size) {
+  const D = 150;
+  const sizes = {
+    'full':           { w: Math.round(8.5*D),  h: Math.round(11*D)    },
+    'half-landscape': { w: Math.round(11*D),   h: Math.round(4.25*D)  },
+    'half-portrait':  { w: Math.round(5.5*D),  h: Math.round(8.5*D)   },
+    'quarter':        { w: Math.round(5.5*D),  h: Math.round(4.25*D)  },
+    'a4':             { w: Math.round(8.27*D), h: Math.round(11.69*D) },
+  };
+  return sizes[size] || sizes['full'];
+}
+
+// ── Draw edges onto page canvas ───────────────────────────────────────────────
+function drawEdgesScaled(ctx, edges, srcW, srcH, marginX, marginTop, lineWidth, drawW, drawH, offsetX, offsetY) {
+  const imgOriginX = offsetX + marginX;
+  const imgOriginY = offsetY + marginTop + marginX;
+  const imgDrawW   = drawW - marginX * 2;
+  const imgDrawH   = drawH - marginTop - marginX * 2;
+
+  if (imgDrawW <= 0 || imgDrawH <= 0) return;
+
+  const scaleX  = imgDrawW / srcW;
+  const scaleY  = imgDrawH / srcH;
+  const lw      = Math.max(1, Math.round(lineWidth));
+  const canvasW = ctx.canvas.width;
+  const canvasH = ctx.canvas.height;
+  const imgData = ctx.getImageData(0, 0, canvasW, canvasH);
+  const data    = imgData.data;
+
+  for (let y = 0; y < srcH; y++) {
+    for (let x = 0; x < srcW; x++) {
+      if (!edges[y * srcW + x]) continue;
+      const px = imgOriginX + Math.round(x * scaleX);
+      const py = imgOriginY + Math.round(y * scaleY);
+      for (let dy = 0; dy < lw; dy++) {
+        for (let dx = 0; dx < lw; dx++) {
+          const cx = px+dx, cy = py+dy;
+          if (cx < 0 || cx >= canvasW || cy < 0 || cy >= canvasH) continue;
+          const idx = (cy * canvasW + cx) * 4;
+          data[idx] = 0; data[idx+1] = 0; data[idx+2] = 0; data[idx+3] = 255;
+        }
+      }
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+}
+
+// ── Page border + title ───────────────────────────────────────────────────────
+function drawPageBorder(ctx, totalW, totalH, margin, title, offsetX, offsetY) {
+  const ox = offsetX || 0, oy = offsetY || 0;
+  ctx.strokeStyle = '#222'; ctx.lineWidth = 3;
+  ctx.strokeRect(ox + margin*0.35, oy + margin*0.35, totalW - margin*0.7, totalH - margin*0.7);
+  ctx.lineWidth = 1;
+  ctx.strokeRect(ox + margin*0.5,  oy + margin*0.5,  totalW - margin,     totalH - margin);
+  ctx.strokeStyle = '#aaa';
+  ctx.beginPath();
+  ctx.moveTo(ox + margin*0.7, oy + margin*1.8);
+  ctx.lineTo(ox + totalW - margin*0.7, oy + margin*1.8);
+  ctx.stroke();
+  ctx.font = `${Math.round(margin*0.55)}px Georgia, serif`;
+  ctx.fillStyle = '#888'; ctx.textAlign = 'center';
+  ctx.fillText(title || 'My Coloring Page', ox + totalW/2, oy + margin*1.45);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════════
+updateAiBadges();
 </script>
 </body>
 </html>
