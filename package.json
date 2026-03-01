@@ -1,6 +1,6 @@
 {
   "name": "colorcraft-studio",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Photo to coloring book page converter",
   "main": "server/server.js",
   "scripts": {

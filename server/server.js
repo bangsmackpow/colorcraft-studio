@@ -59,9 +59,17 @@ app.get('/', (req, res) => {
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// ─── Health check ─────────────────────────────────────────────────────────────
+// ─── Health check / config ────────────────────────────────────────────────────
+const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
+
 app.get('/api/convert', (req, res) => {
-  res.json({ status: 'ok', gemini: !!GEMINI_KEY, model: GEMINI_MODEL });
+  res.json({
+    status:  'ok',
+    appName: APP_NAME,
+    version: pkg.version,
+    gemini:  !!GEMINI_KEY,
+    model:   GEMINI_MODEL,
+  });
 });
 
 // ─── Main convert endpoint ────────────────────────────────────────────────────

@@ -442,6 +442,19 @@
       </div>
 
       <div class="panel" style="margin-top:1.5rem">
+        <div class="panel-title"><span class="num">⚙</span> Version</div>
+        <div class="settings-section" style="margin-bottom:0">
+          <div class="settings-section-title">Running Version</div>
+          <div class="quota-display" id="version-display">
+            <div style="color:rgba(139,111,71,0.5);font-style:italic">Checking…</div>
+          </div>
+          <div style="margin-top:0.75rem">
+            <button class="btn btn-secondary btn-sm" onclick="checkVersion()">Check Now</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:1.5rem">
         <div class="panel-title"><span class="num">⚙</span> App Configuration</div>
         <div class="settings-section">
           <div class="settings-section-title">App Name Override</div>
@@ -616,6 +629,75 @@ function initSettings() {
   // Populate app name override field if set
   const override = localStorage.getItem('cc_app_name_override');
   if (override) document.getElementById('app-name-override').value = override;
+  // Check version on every Settings tab open
+  checkVersion();
+}
+
+// ── Version check ─────────────────────────────────────────────────────────────
+// Running version  → /api/convert (this server, set at build time)
+// Available version → raw.githubusercontent.com (always latest on main)
+// GitHub repo is the source of truth — bump package.json version to signal updates.
+const GITHUB_RAW_PKG =
+  'https://raw.githubusercontent.com/bangsmackpow/colorcraft-studio/main/package.json';
+
+async function checkVersion() {
+  const el = document.getElementById('version-display');
+  if (!el) return;
+  el.innerHTML = `<div style="color:rgba(139,111,71,0.5);font-style:italic">Checking…</div>`;
+
+  let running = 'unknown';
+  let available = 'unknown';
+  let fetchedAvailable = false;
+
+  // 1. Get running version from the local API
+  try {
+    const res  = await fetch('/api/convert');
+    const data = await res.json();
+    running = data.version || 'unknown';
+  } catch {
+    running = 'unavailable';
+  }
+
+  // 2. Get latest version from GitHub
+  try {
+    const res  = await fetch(GITHUB_RAW_PKG + '?t=' + Date.now()); // bust cache
+    const data = await res.json();
+    available = data.version || 'unknown';
+    fetchedAvailable = true;
+  } catch {
+    available = 'unavailable (check network)';
+  }
+
+  // 3. Compare and render
+  const upToDate = fetchedAvailable && running !== 'unknown' && running === available;
+  const behind   = fetchedAvailable && running !== 'unknown' && running !== available;
+
+  const statusColor = upToDate ? '#3d6b42' : behind ? '#c4522a' : 'rgba(139,111,71,0.6)';
+  const statusIcon  = upToDate ? '✓ Up to date' : behind ? '⬆ Update available' : '— Unknown';
+
+  el.innerHTML = `
+    <div class="quota-row">
+      <span>Running version</span>
+      <strong>${running}</strong>
+    </div>
+    <div class="quota-row">
+      <span>Latest on GitHub</span>
+      <strong>${available}</strong>
+    </div>
+    <div class="quota-row" style="margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid rgba(212,168,67,0.2)">
+      <span>Status</span>
+      <strong style="color:${statusColor}">${statusIcon}</strong>
+    </div>
+    ${behind ? `
+    <div style="margin-top:0.6rem;font-size:0.72rem;line-height:1.6;">
+      A new version is available.
+      ${currentMode === 'docker' ? 'Pull and redeploy in Portainer to update.' :
+        'Cloudflare auto-deploys on push — your instance may still be updating.'}
+      <a href="https://github.com/bangsmackpow/colorcraft-studio/releases"
+         target="_blank" rel="noopener"
+         style="color:var(--rust);text-decoration:none;font-weight:600;">View changelog →</a>
+    </div>` : ''}
+  `;
 }
 
 function onKeyInput() {

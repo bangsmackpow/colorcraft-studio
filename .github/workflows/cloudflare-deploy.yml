@@ -1,0 +1,41 @@
+name: Deploy to Cloudflare Pages
+
+# Triggers on every push to main — runs alongside the Docker build workflow
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # allow manual trigger from GitHub Actions UI
+
+jobs:
+  deploy:
+    name: Deploy to Cloudflare Pages
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read version from package.json
+        id: pkg
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Set APP_VERSION secret on Cloudflare Pages
+        # Pushes the current package.json version to Cloudflare so the
+        # running app can report which version it is via /api/convert
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx wrangler@latest pages secret put APP_VERSION \
+            --project-name colorcraft-studio <<< "${{ steps.pkg.outputs.version }}"
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy public --project-name colorcraft-studio --commit-dirty=true

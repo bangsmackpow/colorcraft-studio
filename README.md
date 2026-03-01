@@ -1,8 +1,8 @@
 # ColorCraft Studio
 
-Convert photos into printable coloring book pages. Upload a photo, choose a style, and get a clean line-art coloring page ready to download as PNG or print as PDF — entirely in your browser. No image is sent to a server for processing.
+Convert photos into printable coloring book pages. Upload a photo, choose a style, and get clean line-art ready to download as PNG or print as PDF — all processing happens in your browser. Your photos never leave your device.
 
-AI coloring tips powered by Google Gemini are optional. The app works fully offline without an API key.
+AI coloring tips powered by Google Gemini are optional and configured through the built-in Settings tab. The app works fully without any API key.
 
 ---
 
@@ -10,12 +10,16 @@ AI coloring tips powered by Google Gemini are optional. The app works fully offl
 
 - [Features](#features)
 - [How It Works](#how-it-works)
+- [Architecture](#architecture)
 - [Docker / Portainer](#-docker--portainer)
 - [Cloudflare Pages + Workers](#️-cloudflare-pages--workers)
 - [Reverse Proxy Setup](#-reverse-proxy-setup)
 - [Local Development](#-local-development)
+- [Settings Tab](#-settings-tab)
 - [Environment Variables](#environment-variables)
 - [Project Structure](#project-structure)
+- [Coloring Styles](#coloring-styles)
+- [Print Sizes](#print-sizes)
 - [Roadmap](#roadmap)
 
 ---
@@ -23,44 +27,90 @@ AI coloring tips powered by Google Gemini are optional. The app works fully offl
 ## Features
 
 - **4 line-art styles** — Clean Outlines, Detailed Line Art, Bold & Simple, Intricate Detail
-- **Adjustable line weight and detail level** — fine-tune the output to your taste
+- **Adjustable line weight and detail level** — fine-tune per image with sliders
 - **5 print sizes** — Full page (8.5×11"), half page landscape, half page portrait, quarter page, A4
-- **Custom page title** — set the title printed at the top of the coloring page
-- **Before/after comparison slider** — see the original photo and coloring page side by side
-- **Single and batch mode** — convert one image or a whole queue at once, each with its own style
-- **PNG download + print to PDF** — straight from the browser, no server round trip
-- **AI coloring tips** — optional Gemini integration adds coloring suggestions after each conversion
-- **Configurable app name** — rebrand the header and browser tab via environment variable, no code changes needed
-- **Privacy-friendly** — edge detection runs entirely in the browser via Canvas API; your photos never leave your device for the conversion step
+- **Custom page title** — printed at the top of the coloring page border
+- **Before/after comparison slider** — drag to compare original photo vs coloring page
+- **Single and batch mode** — convert one image or a whole queue, each with its own style
+- **PNG download + print to PDF** — directly from the browser
+- **Settings tab** — configure Gemini AI, view live quota usage, override app name
+- **AI coloring tips** — optional Gemini integration; configured per-user in the Settings tab with your own API key
+- **Configurable app name** — rebrand via environment variable (server) or Settings tab (browser)
+- **Privacy-first** — all image processing runs in your browser; photos never leave your device
 
 ---
 
 ## How It Works
 
 1. **Upload a photo** — drag and drop or click to browse. JPG, PNG, WEBP up to 10 MB
-2. **Choose a style and settings** — pick line weight, detail level, print size, and whether to add a decorative border with a custom title
-3. **Canvas edge detection runs locally** — the Sobel edge detection algorithm extracts outlines directly in your browser. The coloring page appears in seconds
-4. **AI tips load in the background** — if a Gemini API key is configured, coloring suggestions appear after the page is already rendered. The page is usable immediately without waiting
+2. **Choose a style and settings** — line weight, detail level, print size, optional border and title
+3. **Browser pipeline runs locally** — grayscale → smart blur → posterize → Sobel edge detection → line cleanup. The coloring page is ready in seconds with no network call
+4. **AI tips load in the background** — if you have a Gemini key configured in Settings, coloring suggestions appear after the page renders. The page is fully usable before tips arrive
 5. **Download or print** — save as PNG or open the browser print dialog pre-formatted for your chosen paper size
+
+---
+
+## Architecture
+
+ColorCraft Studio is a single-page app with a thin backend. Understanding the split helps when deploying or customizing.
+
+### Image Processing — Browser Only
+
+All coloring page generation happens in the browser via the Canvas API. The pipeline:
+
+```
+Photo (your device)
+  ↓ Grayscale conversion
+  ↓ Smart blur (edge-preserving — kills texture noise, preserves object boundaries)
+  ↓ Posterize (collapses photo gradients into flat tonal bands)
+  ↓ Light smoothing blur (cleans up quantization steps)
+  ↓ Sobel edge detection (fires only at boundaries between tonal bands)
+  ↓ Edge thinning (1-pixel-wide ridges)
+  ↓ Edge dilation (solid, continuous lines)
+  ↓ Composite onto page canvas at print resolution
+  → Clean coloring page PNG
+```
+
+The server **never receives or processes your image pixels.** The only network calls are optional: AI tips sent to Gemini, and the initial `/api/convert` GET used to read server-configured variables like `APP_NAME`.
+
+### Backend — Thin API Layer
+
+The backend has one job: serve the frontend and optionally proxy Gemini for server-configured deployments. It does not perform image processing.
+
+| File | Runtime | Role |
+|---|---|---|
+| `server/server.js` | Node / Express | Docker and local dev — serves static files, handles `POST /api/convert` for server-side Gemini key |
+| `functions/api/convert.js` | Cloudflare Workers | Pages deployment — same API surface, Workers runtime |
+
+### AI Tips — Two Paths
+
+Gemini tips can be configured two ways depending on deployment:
+
+| Path | When used | Key storage |
+|---|---|---|
+| **Browser-direct** | User enters key in Settings tab | Browser `localStorage` — never sent to your server |
+| **Server-side** | `GEMINI_API_KEY` set as env var / secret | Server env — shared across all users of that deployment |
+
+The browser-direct path takes priority if a key is saved in Settings. This means individual users can bring their own key regardless of how the server is configured.
 
 ---
 
 ## 🐳 Docker / Portainer
 
-This is the recommended path for self-hosters. The image is built automatically via GitHub Actions and published to the GitHub Container Registry on every push to `main`.
+Recommended for self-hosters. The image builds automatically via GitHub Actions on every push to `main` and is published to the GitHub Container Registry.
 
 ### Quick start with Portainer
 
 1. In Portainer, go to **Stacks → Add Stack**
 2. Name it `colorcraft-studio`
-3. Paste the following into the compose editor, filling in your values:
+3. Paste the following, substituting your GitHub username:
 
 ```yaml
 version: "3.8"
 
 services:
   colorcraft:
-    image: ghcr.io/YOUR_GITHUB_USERNAME/colorcraft-studio:latest
+    image: ghcr.io/bangsmackpow/colorcraft-studio:latest
     container_name: colorcraft-studio
     restart: unless-stopped
     ports:
@@ -68,8 +118,8 @@ services:
     environment:
       - NODE_ENV=production
       - APP_NAME=ColorCraft Studio
-      - GEMINI_API_KEY=your_key_here
-      - GEMINI_MODEL=gemini-2.0-flash
+      - GEMINI_API_KEY=your_key_here        # optional
+      - GEMINI_MODEL=gemini-2.0-flash       # optional
     deploy:
       resources:
         limits:
@@ -91,18 +141,15 @@ services:
 4. Click **Deploy the stack**
 5. Open `http://your-server-ip:3000`
 
-> **GEMINI_API_KEY** is optional. Get a free key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey). Without it the app works fine — you just won't get AI coloring tips.
+`GEMINI_API_KEY` is optional — get a free key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey). Users can also enter their own key in the Settings tab without any server configuration.
 
 ---
 
 ### Updating to a new version
 
-When a new version is published, pull the latest image and redeploy in Portainer:
+In Portainer: go to your stack → **Pull and redeploy**.
 
-1. Go to your stack in Portainer
-2. Click **Pull and redeploy**
-
-Or from the command line on your server:
+Or from the command line:
 
 ```bash
 docker compose pull && docker compose up -d
@@ -113,100 +160,126 @@ docker compose pull && docker compose up -d
 ### Build and run locally with Docker
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/colorcraft-studio.git
+git clone https://github.com/bangsmackpow/colorcraft-studio.git
 cd colorcraft-studio
 
-# Copy the example env file and fill in your values
-cp .env.example .env
+cp .env.example .env       # edit .env and fill in your values
 
-# Build and start
-docker compose up --build
+docker compose up --build  # http://localhost:3000
 ```
-
-The app will be available at `http://localhost:3000`.
 
 Other useful commands:
 
 ```bash
 docker compose up --build -d    # run in background
-docker compose down             # stop and remove containers
-docker compose logs -f          # stream live logs
-docker compose pull             # pull the latest image without rebuilding
+docker compose down             # stop
+docker compose logs -f          # stream logs
+docker compose pull             # pull latest image
 ```
 
 ---
 
 ## ☁️ Cloudflare Pages + Workers
 
-Cloudflare Pages hosts the static frontend for free with global CDN distribution. The API endpoint (`/api/convert`) runs as a Cloudflare Pages Function (Workers runtime) in the same deployment. R2 can optionally be used to store uploaded originals.
+Cloudflare Pages hosts the static frontend for free with global CDN distribution. The `/api/convert` endpoint runs as a Cloudflare Pages Function (Workers runtime) in the same deployment.
 
 ### Prerequisites
 
 - A free [Cloudflare account](https://cloudflare.com)
-- [Node.js 18+](https://nodejs.org)
-- Wrangler CLI
+- Node.js 18+
+- Wrangler CLI: `npm install -g wrangler && wrangler login`
 
-```bash
-npm install -g wrangler
-wrangler login
-```
+### Deploy — Option A: Cloudflare Git Integration (recommended)
+
+Connect your GitHub repo directly to Cloudflare Pages. Every push to `main` triggers an automatic deploy in ~30 seconds — no manual commands needed.
+
+1. Cloudflare dashboard → **Workers & Pages → Create → Pages → Connect to Git**
+2. Authorize GitHub and select your repository
+3. Configure the build:
+   - **Build command:** *(leave empty — no build step)*
+   - **Build output directory:** `public`
+4. Click **Save and Deploy**
+
+Your app will be live at `https://colorcraft-studio.pages.dev`.
 
 ---
 
-### Deploy to Cloudflare Pages
+### Deploy — Option B: GitHub Actions (auto-deploy on push)
+
+The repo includes a workflow at `.github/workflows/cloudflare-deploy.yml` that deploys to Cloudflare Pages on every push to `main`. It also automatically sets `APP_VERSION` so the in-app version checker stays accurate.
+
+**One-time setup — add two GitHub secrets:**
+
+1. In your GitHub repo: **Settings → Secrets and variables → Actions → New repository secret**
+
+| Secret name | Where to get it |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → **My Profile → API Tokens → Create Token** → use the *Edit Cloudflare Workers* template |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → right sidebar on any Pages/Workers page |
+
+2. First deploy (creates the Pages project):
 
 ```bash
-# Clone the repo
-git clone https://github.com/YOUR_GITHUB_USERNAME/colorcraft-studio.git
+wrangler pages project create colorcraft-studio
+wrangler pages deploy public --project-name colorcraft-studio
+```
+
+After that, every `git push` to `main` deploys automatically.
+
+---
+
+### Manual deploy
+
+```bash
+git clone https://github.com/bangsmackpow/colorcraft-studio.git
 cd colorcraft-studio
 
-# Create the Pages project (first time only)
+# First time only
 wrangler pages project create colorcraft-studio
 
-# Deploy
+# Deploy manually
 wrangler pages deploy public --project-name colorcraft-studio
 ```
 
 Your app will be live at `https://colorcraft-studio.pages.dev`.
 
-To redeploy after any code change:
+### Configure secrets
+
+All secrets are optional. The app runs without them — users can configure Gemini themselves via the Settings tab.
 
 ```bash
-wrangler pages deploy public --project-name colorcraft-studio
-```
-
----
-
-### Configure secrets on Cloudflare
-
-Secrets are set separately from the deploy command. None are required — the app works without them.
-
-```bash
-# Optional — enables AI coloring tips
+# Shared Gemini key for all users (optional)
 wrangler pages secret put GEMINI_API_KEY --project-name colorcraft-studio
 
-# Optional — change which Gemini model is used
+# Gemini model override (optional, defaults to gemini-2.0-flash)
 wrangler pages secret put GEMINI_MODEL --project-name colorcraft-studio
 
-# Optional — rename the app in the header and browser tab
+# App name shown in header and tab (optional)
 wrangler pages secret put APP_NAME --project-name colorcraft-studio
 ```
 
-You can also set these in the Cloudflare dashboard under **Pages → your project → Settings → Environment variables**.
+Or set these in the Cloudflare dashboard under **Pages → your project → Settings → Environment variables**.
 
----
+### Local development with Wrangler
+
+```bash
+cp .env.example .dev.vars
+# Edit .dev.vars with your values
+
+wrangler pages dev public --compatibility-date=2024-09-23
+# http://localhost:8788
+```
 
 ### Optional: Cloudflare R2 storage
 
-R2 lets the worker store uploaded originals in object storage. Without it, the app still works — images are returned as data URLs and processed entirely in the browser. R2 is only useful if you plan to add a gallery or history feature later.
-
-**Create a bucket:**
+R2 can store uploaded originals for future gallery/history features. Without it the app works fine.
 
 ```bash
 wrangler r2 bucket create colorcraft-originals
+wrangler pages secret put PUBLIC_R2_URL --project-name colorcraft-studio
 ```
 
-**Add the binding to `wrangler.toml`:**
+Add to `wrangler.toml`:
 
 ```toml
 [[r2_buckets]]
@@ -214,55 +287,13 @@ binding = "BUCKET"
 bucket_name = "colorcraft-originals"
 ```
 
-**Add the public URL secret:**
-
-```bash
-wrangler pages secret put PUBLIC_R2_URL --project-name colorcraft-studio
-# Enter: https://pub-xxxxxxxxxxxxxxxx.r2.dev
-```
-
----
-
-### Local development with Wrangler
-
-To test the Cloudflare Pages Function locally (instead of the Express server):
-
-```bash
-# Create your local secrets file
-cp .env.example .dev.vars
-# Edit .dev.vars and add GEMINI_API_KEY etc.
-
-wrangler pages dev public --compatibility-date=2024-09-23
-```
-
-The app will be available at `http://localhost:8788`.
-
----
-
-### How APP_NAME works across deployments
-
-The app name shown in the header and browser tab is configurable without touching any code.
-
-| Deployment | How to set it | How it's applied |
-|---|---|---|
-| **Docker** | `APP_NAME=My Studio` in `.env` or compose | Server injects it into the HTML before sending |
-| **Cloudflare Pages** | `APP_NAME` secret via Wrangler or dashboard | API returns it on page load; JS updates the DOM |
-| **Local dev (Express)** | `APP_NAME=My Studio` in `.env` | Same as Docker |
-| **Local dev (Wrangler)** | `APP_NAME=My Studio` in `.dev.vars` | Same as Cloudflare |
-
-The header wordmark splits on the last word and colors it in the accent color. For example, `My Coloring App` renders as `My Coloring` + `App` (colored).
-
 ---
 
 ## 🔀 Reverse Proxy Setup
 
-When running behind a reverse proxy, expose the app on a subdomain or path without opening port 3000 publicly. The app has no special requirements — it's a standard HTTP server with no WebSocket connections.
-
----
+The app is a standard HTTP server with no WebSocket connections — any reverse proxy works.
 
 ### Caddy
-
-Caddy handles HTTPS automatically via Let's Encrypt. Add this to your `Caddyfile`:
 
 ```caddyfile
 colorcraft.yourdomain.com {
@@ -270,9 +301,9 @@ colorcraft.yourdomain.com {
 }
 ```
 
-If Caddy is running in the same Docker network as the app, use the container name (`colorcraft-studio`) as the upstream host. If Caddy is on the host, use `localhost:3000`.
+Use the container name as the upstream if Caddy shares a Docker network with the app. Use `localhost:3000` if Caddy runs on the host.
 
-To put the app at a path rather than a subdomain:
+Path-based (subdirectory instead of subdomain):
 
 ```caddyfile
 yourdomain.com {
@@ -283,25 +314,19 @@ yourdomain.com {
 }
 ```
 
----
-
 ### Traefik
 
-Add labels to the container in your `docker-compose.yml`. Traefik must be running and connected to the same Docker network.
+Remove the `ports:` block from your compose file when using Traefik — it routes directly to the container.
 
 ```yaml
-version: "3.8"
-
 services:
   colorcraft:
-    image: ghcr.io/YOUR_GITHUB_USERNAME/colorcraft-studio:latest
+    image: ghcr.io/bangsmackpow/colorcraft-studio:latest
     container_name: colorcraft-studio
     restart: unless-stopped
-    # Remove the ports: block when using Traefik — Traefik routes directly to the container
     environment:
       - NODE_ENV=production
       - APP_NAME=ColorCraft Studio
-      - GEMINI_API_KEY=your_key_here
     networks:
       - traefik-public
     labels:
@@ -316,83 +341,126 @@ networks:
     external: true
 ```
 
-Replace `traefik-public` with the name of your existing Traefik network, and `letsencrypt` with your cert resolver name if different.
-
----
+Replace `traefik-public` with your Traefik network name and `letsencrypt` with your cert resolver name.
 
 ### Nginx Proxy Manager
 
-Nginx Proxy Manager (NPM) is configured through its web UI — no config files needed.
+1. **Proxy Hosts → Add Proxy Host**
+2. **Details tab:**
+   - Domain: `colorcraft.yourdomain.com`
+   - Scheme: `http`
+   - Forward hostname: `colorcraft-studio` (container name) or server's local IP
+   - Forward port: `3000`
+   - Enable Block Common Exploits
+3. **SSL tab:** Request new certificate, enable Force SSL and HTTP/2
+4. Save
 
-1. In NPM, go to **Proxy Hosts → Add Proxy Host**
-2. Fill in the **Details** tab:
-   - **Domain Names:** `colorcraft.yourdomain.com`
-   - **Scheme:** `http`
-   - **Forward Hostname / IP:** `colorcraft-studio` (container name) or your server's local IP
-   - **Forward Port:** `3000`
-   - Enable **Block Common Exploits**
-3. On the **SSL** tab:
-   - Select **Request a new SSL Certificate**
-   - Enable **Force SSL** and **HTTP/2 Support**
-   - Agree to the Let's Encrypt terms of service
-4. Click **Save**
-
-NPM will obtain a certificate and your app will be live at `https://colorcraft.yourdomain.com`.
-
-> **Note:** For NPM to reach the container by name, NPM and the ColorCraft container must be on the same Docker network. In Portainer, add the NPM network to the stack or use your server's local IP as the forward hostname instead.
+> NPM and the ColorCraft container must share a Docker network to use the container name as the hostname. Otherwise use the server's local IP.
 
 ---
 
 ## 💻 Local Development
 
-### With Node.js (Express server)
+### Node.js / Express
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/colorcraft-studio.git
+git clone https://github.com/bangsmackpow/colorcraft-studio.git
 cd colorcraft-studio
 
 npm install
 
 cp .env.example .env
-# Edit .env — add GEMINI_API_KEY if you have one, set APP_NAME if desired
+# Edit .env — set APP_NAME, GEMINI_API_KEY if desired
 
 npm start        # http://localhost:3000
-npm run dev      # same, but restarts automatically when files change
+npm run dev      # auto-restarts on file changes
 ```
 
-### With Wrangler (Cloudflare runtime)
+### Wrangler (Cloudflare runtime)
 
 ```bash
 cp .env.example .dev.vars
-# Edit .dev.vars with your values
 
 wrangler pages dev public --compatibility-date=2024-09-23
 # http://localhost:8788
 ```
 
-Use Wrangler local dev when testing changes to `functions/api/convert.js`. Use `npm run dev` for everything else — it's faster to iterate.
+Use Wrangler when testing changes to `functions/api/convert.js`. Use `npm run dev` for everything else — it starts faster.
+
+---
+
+## ⚙ Settings Tab
+
+The Settings tab (third tab in the navigation) lets each user configure AI and personalization without touching server config.
+
+### Version Check
+
+The Settings tab shows the running version of the app alongside the latest version available on GitHub. If they differ, an update notice appears with instructions.
+
+The running version is read from `/api/convert` (set at build time from `package.json`). The latest version is fetched live from `raw.githubusercontent.com`. No login or token required — it's a public file read.
+
+**To signal a new release:** bump the `version` field in `package.json` before pushing. The GitHub Actions workflow automatically propagates the new version to Cloudflare via `APP_VERSION`. Docker deployments read it directly from `package.json` at startup.
+
+> **Note:** Update `GITHUB_RAW_PKG` in `index.html` with your actual GitHub username before deploying — otherwise the version check won't be able to reach your repo.
+
+### Gemini AI Setup
+
+1. Get a free API key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
+2. Open **Settings → AI Enhancement**
+3. Paste your key and click **Save Key**
+4. Click **Test Connection** to verify — the app pings the Gemini API directly from your browser
+5. Check **Enable AI coloring tips** to activate
+
+Your key is stored in your browser's `localStorage`. It is never sent to the ColorCraft server — Gemini API calls go directly from your browser to Google's servers.
+
+### Quota Display
+
+The quota panel shows:
+
+- Free tier limit (1,500 requests/day on `gemini-2.0-flash`)
+- Requests used this session
+- Approximate time until daily quota resets (midnight UTC)
+
+Each image conversion uses 1 request when AI tips are enabled.
+
+### App Name Override
+
+Type a custom name and click **Apply** to rename the app in your browser. This overrides the server-configured name locally and persists across sessions. Click **Reset to Default** to revert.
 
 ---
 
 ## Environment Variables
 
-All environment variables are optional. The app runs without any of them.
+All variables are optional. The app runs without any configuration.
 
-| Variable | Default | Description |
-|---|---|---|
-| `PORT` | `3000` | Port the Express server listens on (Docker / local only) |
-| `APP_NAME` | `ColorCraft Studio` | App name shown in the header and browser tab |
-| `GEMINI_API_KEY` | *(empty)* | Enables AI coloring tips. Get a free key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
-| `GEMINI_MODEL` | `gemini-2.0-flash` | Gemini model to use. Change if your account has access to a different model |
-| `BUCKET` | *(empty)* | Cloudflare R2 bucket binding name (Cloudflare only) |
-| `PUBLIC_R2_URL` | *(empty)* | Public URL of your R2 bucket (Cloudflare only) |
+| Variable | Default | Deployment | Description |
+|---|---|---|---|
+| `PORT` | `3000` | Docker / local | Port the Express server listens on |
+| `APP_NAME` | `ColorCraft Studio` | Both | App name in header and browser tab |
+| `APP_VERSION` | *(from package.json)* | Both | Running version reported by `/api/convert`. Set automatically by the GitHub Actions deploy workflow on Cloudflare. Read from `package.json` on Docker |
+| `GEMINI_API_KEY` | *(empty)* | Both | Server-side Gemini key — shared across all users. Individual users can set their own key in the Settings tab instead |
+| `GEMINI_MODEL` | `gemini-2.0-flash` | Both | Gemini model for server-side requests |
+| `BUCKET` | *(empty)* | Cloudflare only | R2 bucket binding name |
+| `PUBLIC_R2_URL` | *(empty)* | Cloudflare only | Public URL of R2 bucket |
 
-**Setting variables:**
+**Where to set them:**
 
-- **Docker / Portainer** — set in the `environment:` block of your compose file, or in a `.env` file alongside `docker-compose.yml`
-- **Cloudflare Pages** — use `wrangler pages secret put VARIABLE_NAME` or the Cloudflare dashboard
-- **Local Express** — set in `.env` (copy from `.env.example`)
-- **Local Wrangler** — set in `.dev.vars` (copy from `.env.example`)
+| Deployment | How |
+|---|---|
+| Docker / Portainer | `environment:` block in compose file, or `.env` alongside `docker-compose.yml` |
+| Cloudflare Pages | `wrangler pages secret put VARIABLE` or Cloudflare dashboard |
+| Local Express | `.env` file (copy from `.env.example`) |
+| Local Wrangler | `.dev.vars` file (copy from `.env.example`) |
+
+### APP_NAME across deployments
+
+| Deployment | How it's applied |
+|---|---|
+| Docker | Express reads env var, injects into HTML before serving |
+| Cloudflare Pages | Worker reads secret, returns in API response, JS updates DOM on load |
+| Settings tab | User override stored in `localStorage`, applied immediately |
+
+Priority order: Settings tab override → server env var → default (`ColorCraft Studio`)
 
 ---
 
@@ -401,63 +469,64 @@ All environment variables are optional. The app runs without any of them.
 ```
 colorcraft-studio/
 ├── public/
-│   └── index.html              # Entire frontend — UI, canvas renderer, styles
-│                               # Shared between Docker and Cloudflare deployments
+│   └── index.html              # Entire frontend — UI, image pipeline, all styles
+│                               # Single file, shared between all deployments
 ├── server/
-│   └── server.js               # Express server for Docker / local deployment
-│                               # Serves static files + handles POST /api/convert
+│   └── server.js               # Express server (Docker / local)
+│                               # Serves public/, handles POST /api/convert
 ├── functions/
 │   └── api/
-│       └── convert.js          # Cloudflare Pages Function
-│                               # Same logic as server.js, Workers runtime
+│       └── convert.js          # Cloudflare Pages Function (Workers runtime)
+│                               # Same API contract as server.js
 ├── .github/
 │   └── workflows/
-│       └── docker-build.yml    # GitHub Actions — builds and pushes image to
-│                               # ghcr.io on every push to main
-├── Dockerfile                  # Two-stage Node 20 Alpine build
-├── docker-compose.yml          # Portainer / Docker Compose stack definition
-├── wrangler.toml               # Cloudflare Pages / Workers configuration
-├── package.json                # Node dependencies (express, multer)
-├── .env.example                # Template for local .env / .dev.vars
+│       ├── docker-build.yml        # Builds + pushes to ghcr.io on push to main
+│       └── cloudflare-deploy.yml   # Deploys to Cloudflare Pages + sets APP_VERSION
+├── Dockerfile                  # Multi-stage Node 20 Alpine build, non-root user
+├── docker-compose.yml          # Portainer / Compose stack
+├── wrangler.toml               # Cloudflare Pages configuration
+├── package.json                # express, multer
+├── .env.example                # Documents all env vars, template for .env / .dev.vars
 └── .gitignore
 ```
 
-**Two server files, one frontend.** `server/server.js` and `functions/api/convert.js` do the same job: validate the uploaded image, optionally call Gemini for coloring tips, and return the result. The actual coloring page is rendered entirely in the browser via Canvas — the server never processes the image pixels.
-
----
-
-## Print Sizes
-
-| Option | Dimensions | Notes |
-|---|---|---|
-| Full page | 8.5 × 11" | Standard US Letter — fits one image per page |
-| Half page landscape | 11 × 4.25" | Print two per sheet, cut horizontally |
-| Half page portrait | 5.5 × 8.5" | Print two per sheet, cut vertically |
-| Quarter page | 5.5 × 4.25" | Print four per sheet |
-| A4 | 210 × 297mm | Standard international paper size |
-
-All sizes render at 150 DPI. The image is fitted and centered on the page with white letterboxing so nothing is cropped.
+The frontend is a single self-contained HTML file. The two server files (`server.js` and `convert.js`) share the same API contract — both accept `POST /api/convert` with a multipart image upload and return JSON with optional `coloringTips` and `appName` fields. Image processing does not happen on the server in either case.
 
 ---
 
 ## Coloring Styles
 
-| Style | Line Weight | Best For |
+| Style | Character | Best for |
 |---|---|---|
-| **Clean Outlines** | Medium | Classic coloring book look, all skill levels |
-| **Detailed Line Art** | Thin | Outlines plus internal detail lines for shading guidance |
-| **Bold & Simple** | Thick | Young children, beginners, images with large shapes |
-| **Intricate Detail** | Very thin | Advanced colorists, photos with fine texture and pattern |
+| **Clean Outlines** | Bold, clear boundaries | Classic coloring book look, all ages |
+| **Detailed Line Art** | Medium lines + internal structure | Shading guidance, intermediate colorists |
+| **Bold & Simple** | Thick lines, large open areas | Young children, beginners, simple subjects |
+| **Intricate Detail** | Fine lines, maximum edge density | Advanced colorists, complex subjects |
 
-Line weight and detail level can be further adjusted with the sliders regardless of style.
+The **Line Weight** slider scales the stroke thickness within each style. The **Detail Level** slider controls how many tonal bands the posterizer uses — more bands means more internal lines within objects.
+
+---
+
+## Print Sizes
+
+| Size | Dimensions | Notes |
+|---|---|---|
+| Full page | 8.5 × 11" | US Letter — one image per page |
+| Half page landscape | 11 × 4.25" | Two per sheet, cut horizontally |
+| Half page portrait | 5.5 × 8.5" | Two per sheet, cut vertically |
+| Quarter page | 5.5 × 4.25" | Four per sheet |
+| A4 | 210 × 297mm | International standard |
+
+All sizes render at 150 DPI. Images are fitted and centered with white letterboxing — nothing is cropped.
 
 ---
 
 ## Roadmap
 
 - [ ] User accounts and saved conversion history
-- [ ] Free tier with paid plans via Stripe
+- [ ] Free and paid tiers via Stripe
 - [ ] Batch ZIP download
+- [ ] Additional AI provider support (OpenAI, Stability AI lineart)
 - [ ] Custom watermark option
 
 ---

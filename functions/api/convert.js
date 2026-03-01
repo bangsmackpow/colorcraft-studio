@@ -31,7 +31,12 @@ export async function onRequestPost(context) {
 
 export async function onRequestGet(context) {
   const { env } = context;
-  return corsResponse(new Response(JSON.stringify({ status: 'ok', appName: env.APP_NAME || null }), {
+  // APP_VERSION is set automatically by the GitHub Actions deploy workflow
+  return corsResponse(new Response(JSON.stringify({
+    status:  'ok',
+    appName: env.APP_NAME    || null,
+    version: env.APP_VERSION || 'unknown',
+  }), {
     headers: { 'Content-Type': 'application/json' },
   }));
 }

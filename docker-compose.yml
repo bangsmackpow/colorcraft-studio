@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   colorcraft:
-    image: ghcr.io/YOUR_GITHUB_USERNAME/colorcraft-studio:latest
+    image: ghcr.io/bangsmackpow/colorcraft-studio:latest
     container_name: colorcraft-studio
     restart: unless-stopped
     ports:
