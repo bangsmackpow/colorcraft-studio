@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   colorcraft:
     image: ghcr.io/bangsmackpow/colorcraft-studio:latest
